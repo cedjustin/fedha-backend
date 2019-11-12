@@ -9,12 +9,14 @@
   "author": "ced",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^3.0.6",
     "body-parser": "*",
     "cors": "*",
+    "dotenv": "^8.1.0",
     "express": "*",
     "express-validator": "*",
+    "jsonwebtoken": "^8.5.1",
     "multer": "*",
-    "passport-local": "^1.0.0",
     "pg": "*"
   }
 }

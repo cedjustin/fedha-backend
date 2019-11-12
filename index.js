@@ -1,4 +1,5 @@
 // importing dependencies
+require('dotenv').config()
 const express = require('express');
 const routes = require('./routes/routes');
 var bodyParser = require('body-parser')
