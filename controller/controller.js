@@ -270,7 +270,6 @@ module.exports.delPostController = async (postId) => {
     })
     return response;
 }
-
 // module.exports.getMonthlyBudgetsController = async (userid, timestamp) => {
 //     let response;
 //     userexists = await checkIfUserExists(userid);
