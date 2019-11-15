@@ -264,7 +264,7 @@ module.exports.delPostController = async (postId) => {
     }).catch(e => {
         response = {
             error: 1,
-            message: "post not deleted"
+            message: "post not deleted "
         }
         console.log(e);
     })
