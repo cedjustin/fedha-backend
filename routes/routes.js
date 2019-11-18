@@ -12,7 +12,10 @@ const {
     updPostController,
     delPostController,
     getPostsOnSaleController,
-    getPostsOnDiscountController
+    getPostsOnDiscountController,
+    getPostsCountController,
+    getSalesPostsCountController,
+    getDiscountedPostsCountController
 } = require('../controller/controller');
 
 
@@ -204,6 +207,33 @@ router.get('/get-posts-on-discount', verifyToken, async (req, res) => {
         return res.json({ response })
     })
 });
+
+// get all products count
+router.get('/all-posts-count', verifyToken, async (req, res) => {
+
+    // when everything is okay
+    await getPostsCountController().then(response => {
+        return res.json({ response })
+    })
+})
+
+// get all sales products count
+router.get('/sales-posts-count', verifyToken, async (req, res) => {
+
+    // when everything is okay
+    await getSalesPostsCountController().then(response => {
+        return res.json({ response })
+    })
+})
+
+// get all sales products count
+router.get('/discounted-posts-count', verifyToken, async (req, res) => {
+
+    // when everything is okay
+    await getDiscountedPostsCountController().then(response => {
+        return res.json({ response })
+    })
+})
 
 // verify token
 function verifyToken(req, res, next) {

@@ -325,6 +325,97 @@ module.exports.getPostsOnDiscountController = async (offset, order, sortby) => {
         } else {
             response = {
                 error: 0,
+                message: 'you have set ' + res.rows.count+ ' posts',
+                data: res.rows
+            }
+        }
+    }).catch(e => {
+        console.log(e)
+        response = {
+            error: 1,
+            message: "404"
+        };
+    });
+    return response;
+}
+
+
+//a function to get the count of all posts
+module.exports.getPostsCountController = async (offset, order, sortby) => {
+    let response;
+    getPostsQuery = {
+        text: 'SELECT COUNT(1) FROM posts'
+    }
+    await client.query(getPostsQuery).then(async res => {
+        if (res.rows.length <= 0) {
+            response = {
+                error: 1,
+                message: 'you have no posts'
+            }
+        } else {
+            response = {
+                error: 0,
+                message: 'you have set ' + res.rows.count + ' posts',
+                data: res.rows
+            }
+        }
+    }).catch(e => {
+        console.log(e)
+        response = {
+            error: 1,
+            message: "404"
+        };
+    });
+    return response;
+}
+
+
+//a function to get the count of all sales posts
+module.exports.getSalesPostsCountController = async (offset, order, sortby) => {
+    let response;
+    getPostsQuery = {
+        text: 'SELECT COUNT(1) FROM posts WHERE onsale = $1',
+        values:['1']
+    }
+    await client.query(getPostsQuery).then(async res => {
+        if (res.rows.length <= 0) {
+            response = {
+                error: 1,
+                message: 'you have no posts on sales'
+            }
+        } else {
+            response = {
+                error: 0,
+                message: 'you have set ' + res.rows.length + ' posts',
+                data: res.rows
+            }
+        }
+    }).catch(e => {
+        console.log(e)
+        response = {
+            error: 1,
+            message: "404"
+        };
+    });
+    return response;
+}
+
+//a function to get the count of all discounted posts
+module.exports.getDiscountedPostsCountController = async (offset, order, sortby) => {
+    let response;
+    getPostsQuery = {
+        text: 'SELECT COUNT(1) FROM posts WHERE discountexp != $1',
+        values:['0']
+    }
+    await client.query(getPostsQuery).then(async res => {
+        if (res.rows.length <= 0) {
+            response = {
+                error: 1,
+                message: 'you have no discounted posts'
+            }
+        } else {
+            response = {
+                error: 0,
                 message: 'you have set ' + res.rows.length + ' posts',
                 data: res.rows
             }
