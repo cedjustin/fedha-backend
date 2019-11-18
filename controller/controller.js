@@ -148,35 +148,6 @@ const checkIfPostExists = async (categoryid, description, amount) => {
     return response;
 }
 
-// function to get all budgets
-module.exports.getPostsController = async () => {
-    let response;
-    getPostsQuery = {
-        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount FROM posts'
-    }
-    await client.query(getPostsQuery).then(async res => {
-        if (res.rows.length <= 0) {
-            response = {
-                error: 1,
-                message: 'you have no posts'
-            }
-        } else {
-            response = {
-                error: 0,
-                message: 'you have set ' + res.rows.length + ' posts',
-                data: res.rows
-            }
-        }
-    }).catch(e => {
-        console.log(e)
-        response = {
-            error: 1,
-            message: "404"
-        };
-    });
-    return response;
-}
-
 // function to add a post or product
 module.exports.addPostController = async (categoryid, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, genderId, rate) => {
     getTimeStamp = await _getTimeStamp();
@@ -220,7 +191,7 @@ module.exports.addPostController = async (categoryid, description, linkToImage, 
 }
 
 // function to update all budgets
-module.exports.updPostController = async (categoryid, datecreated, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, genderId, rate, postId) => {
+module.exports.updPostController = async (categoryid, datecreated, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, genderId, rate, postId, sortby, offset, order) => {
     getTimeStamp = await _getTimeStamp();
     categoryid = categoryid.trim();
     datecreated = datecreated.trim();
@@ -247,7 +218,7 @@ module.exports.updPostController = async (categoryid, datecreated, description, 
             values: [categoryid, getTimeStamp, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, postId]
         }
         await client.query(updatePostQuery).then(async res => {
-            response = await this.getPostsController();
+            response = await this.getPostsController(sortby, offset, order);
         }).catch(e => {
             console.log(e);
             response = {
@@ -277,13 +248,43 @@ module.exports.delPostController = async (postId) => {
     return response;
 }
 
-
-//a function to get posts which are only on sales
-module.exports.getPostsOnSaleController = async () => {
+// function to get all budgets
+module.exports.getPostsController = async (offset, order, sortby) => {
     let response;
     getPostsQuery = {
-        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount FROM posts WHERE onsale = $1',
-        values: ['1']
+        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount FROM posts ORDER BY ' + sortby + ' ' + order + ' OFFSET $1 FETCH FIRST 10 ROWS ONLY',
+        values: [offset]
+    }
+    await client.query(getPostsQuery).then(async res => {
+        if (res.rows.length <= 0) {
+            response = {
+                error: 1,
+                message: 'you have no posts'
+            }
+        } else {
+            response = {
+                error: 0,
+                message: 'you have set ' + res.rows.length + ' posts',
+                data: res.rows
+            }
+        }
+    }).catch(e => {
+        console.log(e)
+        response = {
+            error: 1,
+            message: "404"
+        };
+    });
+    return response;
+}
+
+
+//a function to get posts which are only on sales
+module.exports.getPostsOnSaleController = async (offset, order, sortby) => {
+    let response;
+    getPostsQuery = {
+        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount FROM posts WHERE onsale = $1 ORDER BY ' + sortby + ' ' + order + ' OFFSET $2 FETCH FIRST 10 ROWS ONLY',
+        values: ['1', offset]
     }
     await client.query(getPostsQuery).then(async res => {
         if (res.rows.length <= 0) {
@@ -309,11 +310,11 @@ module.exports.getPostsOnSaleController = async () => {
 }
 
 //a function to get posts which are only on sales
-module.exports.getPostsOnDiscountController = async () => {
+module.exports.getPostsOnDiscountController = async (offset, order, sortby) => {
     let response;
     getPostsQuery = {
-        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount FROM posts WHERE discountexp != $1',
-        values: ['0']
+        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount FROM posts WHERE discountexp != $1 ORDER BY ' + sortby + ' ' + order + ' OFFSET $2 FETCH FIRST 10 ROWS ONLY',
+        values: ['0', offset]
     }
     await client.query(getPostsQuery).then(async res => {
         if (res.rows.length <= 0) {
