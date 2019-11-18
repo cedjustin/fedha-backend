@@ -252,7 +252,7 @@ module.exports.delPostController = async (postId) => {
 module.exports.getPostsController = async (offset, order, sortby) => {
     let response;
     getPostsQuery = {
-        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount FROM posts ORDER BY ' + sortby + ' ' + order + ' OFFSET $1 FETCH FIRST 10 ROWS ONLY',
+        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount,rate FROM posts ORDER BY ' + sortby + ' ' + order + ' OFFSET $1 FETCH FIRST 10 ROWS ONLY',
         values: [offset]
     }
     await client.query(getPostsQuery).then(async res => {
@@ -283,7 +283,7 @@ module.exports.getPostsController = async (offset, order, sortby) => {
 module.exports.getPostsOnSaleController = async (offset, order, sortby) => {
     let response;
     getPostsQuery = {
-        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount FROM posts WHERE onsale = $1 ORDER BY ' + sortby + ' ' + order + ' OFFSET $2 FETCH FIRST 10 ROWS ONLY',
+        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount,rate FROM posts WHERE onsale = $1 ORDER BY ' + sortby + ' ' + order + ' OFFSET $2 FETCH FIRST 10 ROWS ONLY',
         values: ['1', offset]
     }
     await client.query(getPostsQuery).then(async res => {
@@ -313,7 +313,7 @@ module.exports.getPostsOnSaleController = async (offset, order, sortby) => {
 module.exports.getPostsOnDiscountController = async (offset, order, sortby) => {
     let response;
     getPostsQuery = {
-        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount FROM posts WHERE discountexp != $1 ORDER BY ' + sortby + ' ' + order + ' OFFSET $2 FETCH FIRST 10 ROWS ONLY',
+        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount,rate FROM posts WHERE discountexp != $1 ORDER BY ' + sortby + ' ' + order + ' OFFSET $2 FETCH FIRST 10 ROWS ONLY',
         values: ['0', offset]
     }
     await client.query(getPostsQuery).then(async res => {
@@ -341,7 +341,7 @@ module.exports.getPostsOnDiscountController = async (offset, order, sortby) => {
 
 
 //a function to get the count of all posts
-module.exports.getPostsCountController = async (offset, order, sortby) => {
+module.exports.getPostsCountController = async () => {
     let response;
     getPostsQuery = {
         text: 'SELECT COUNT(1) FROM posts'
@@ -371,7 +371,7 @@ module.exports.getPostsCountController = async (offset, order, sortby) => {
 
 
 //a function to get the count of all sales posts
-module.exports.getSalesPostsCountController = async (offset, order, sortby) => {
+module.exports.getSalesPostsCountController = async () => {
     let response;
     getPostsQuery = {
         text: 'SELECT COUNT(1) FROM posts WHERE onsale = $1',
@@ -401,7 +401,7 @@ module.exports.getSalesPostsCountController = async (offset, order, sortby) => {
 }
 
 //a function to get the count of all discounted posts
-module.exports.getDiscountedPostsCountController = async (offset, order, sortby) => {
+module.exports.getDiscountedPostsCountController = async () => {
     let response;
     getPostsQuery = {
         text: 'SELECT COUNT(1) FROM posts WHERE discountexp != $1',

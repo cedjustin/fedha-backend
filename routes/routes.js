@@ -156,6 +156,7 @@ router.get('/get-posts', verifyToken, async (req, res) => {
 
     // deconstracting data
     const { sortby, offset, order } = req.headers;
+    console.log(req.headers);
 
     // when everything is okay
     await getPostsController(offset, order, sortby).then(response => {
