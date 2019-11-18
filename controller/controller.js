@@ -1,5 +1,7 @@
 // importing dependencies
-const { Client } = require('pg');
+const {
+    Client
+} = require('pg');
 const bcrypt = require('bcryptjs');
 const saltRounds = 10;
 
@@ -176,16 +178,18 @@ module.exports.getPostsController = async () => {
 }
 
 // function to add a post or product
-module.exports.addPostController = async (categoryid, description, linkToImage, inStock, discountexp, onsale, saleexp, amount) => {
+module.exports.addPostController = async (categoryid, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, genderId, rate) => {
     getTimeStamp = await _getTimeStamp();
     categoryid = categoryid.trim();
     description = description.trim();
-    linkToImage = linkToImage.trim();
+    linkToImage = linkToImage.replace('dl=0', 'raw=1');
     inStock = inStock.trim();
     discountexp = discountexp.trim();
     onsale = onsale.trim();
     saleexp = saleexp.trim();
     amount = amount.trim();
+    genderId = genderId.trim();
+    rate = rate.trim();
     let response;
     let postExists = await checkIfPostExists(categoryid, description, amount);
     if (postExists) {
@@ -195,8 +199,8 @@ module.exports.addPostController = async (categoryid, description, linkToImage, 
         }
     } else {
         let insertQuery = {
-            text: 'INSERT INTO posts(catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *',
-            values: [categoryid, getTimeStamp, description, linkToImage, inStock, discountexp, onsale, saleexp, amount]
+            text: 'INSERT INTO posts(catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount,genderid,rate) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *',
+            values: [categoryid, getTimeStamp, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, genderId, rate]
         }
         await client.query(insertQuery).then(async res => {
             response = {
@@ -216,18 +220,20 @@ module.exports.addPostController = async (categoryid, description, linkToImage, 
 }
 
 // function to update all budgets
-module.exports.updPostController = async (categoryid, datecreated, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, postId) => {
+module.exports.updPostController = async (categoryid, datecreated, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, genderId, rate, postId) => {
     getTimeStamp = await _getTimeStamp();
     categoryid = categoryid.trim();
     datecreated = datecreated.trim();
     description = description.trim();
-    linkToImage = linkToImage.trim();
+    linkToImage = linkToImage.replace('dl=0', 'raw=1');
     inStock = inStock.trim();
     discountexp = discountexp.trim();
     onsale = onsale.trim();
     saleexp = saleexp.trim();
     amount = amount.trim();
     postId = postId.trim();
+    genderId = genderId.trim();
+    rate = rate.trim();
     let response;
     const allPosts = await this.getPostsController();
     if (allPosts.error == 1 && allPosts.message == 'there are no posts') {
@@ -270,6 +276,69 @@ module.exports.delPostController = async (postId) => {
     })
     return response;
 }
+
+
+//a function to get posts which are only on sales
+module.exports.getPostsOnSaleController = async () => {
+    let response;
+    getPostsQuery = {
+        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount FROM posts WHERE onsale = $1',
+        values: ['1']
+    }
+    await client.query(getPostsQuery).then(async res => {
+        if (res.rows.length <= 0) {
+            response = {
+                error: 1,
+                message: 'you have no posts on sale'
+            }
+        } else {
+            response = {
+                error: 0,
+                message: 'you have set ' + res.rows.length + ' posts',
+                data: res.rows
+            }
+        }
+    }).catch(e => {
+        console.log(e)
+        response = {
+            error: 1,
+            message: "404"
+        };
+    });
+    return response;
+}
+
+//a function to get posts which are only on sales
+module.exports.getPostsOnDiscountController = async () => {
+    let response;
+    getPostsQuery = {
+        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount FROM posts WHERE discountexp != $1',
+        values: ['0']
+    }
+    await client.query(getPostsQuery).then(async res => {
+        if (res.rows.length <= 0) {
+            response = {
+                error: 1,
+                message: 'you have no posts on discount'
+            }
+        } else {
+            response = {
+                error: 0,
+                message: 'you have set ' + res.rows.length + ' posts',
+                data: res.rows
+            }
+        }
+    }).catch(e => {
+        console.log(e)
+        response = {
+            error: 1,
+            message: "404"
+        };
+    });
+    return response;
+}
+
+
 // module.exports.getMonthlyBudgetsController = async (userid, timestamp) => {
 //     let response;
 //     userexists = await checkIfUserExists(userid);

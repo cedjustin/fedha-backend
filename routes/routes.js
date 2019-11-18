@@ -10,7 +10,9 @@ const {
     addPostController,
     getPostsController,
     updPostController,
-    delPostController
+    delPostController,
+    getPostsOnSaleController,
+    getPostsOnDiscountController
 } = require('../controller/controller');
 
 
@@ -89,8 +91,10 @@ router.post('/add-post', verifyToken, [
     check('instock').exists().withMessage('You must provide a inStock'),
     check('discountexp').exists().withMessage('You must provide a discountexp'),
     check('onsale').exists().withMessage('You must provide if product is on sale'),
-    check('saleexp').exists().withMessage('You must provide if product is on sale'),
-    check('amount').exists().withMessage('You must provide the amount')
+    check('saleexp').exists().withMessage('You must provide when product sale will expire'),
+    check('amount').exists().withMessage('You must provide the amount'),
+    check('genderid').exists().withMessage('You must provide the gender id'),
+    check('rate').exists().withMessage('You must provide the ratings')
 ], async (req, res) => {
     // validating data
     const errors = validationResult(req);
@@ -99,9 +103,9 @@ router.post('/add-post', verifyToken, [
         return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
     } else {
         // deformating all data
-        const { categoryid, description, linktoimage, instock, discountexp, onsale, saleexp, amount } = req.body;
+        const { categoryid, description, linktoimage, instock, discountexp, onsale, saleexp, amount, genderid, rate } = req.body;
         // when everything is okay
-        await addPostController(categoryid, description, linktoimage, instock, discountexp, onsale, saleexp, amount).then(response => {
+        await addPostController(categoryid, description, linktoimage, instock, discountexp, onsale, saleexp, amount, genderid, rate).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);
@@ -120,7 +124,9 @@ router.put('/upd-post', verifyToken, [
     check('onsale').exists().withMessage('You must provide if product is on sale'),
     check('saleexp').exists().withMessage('You must provide if product is on sale'),
     check('amount').exists().withMessage('You must provide the amount'),
-    check('postid').exists().withMessage('You must provide the postid')
+    check('postid').exists().withMessage('You must provide the postid'),
+    check('genderid').exists().withMessage('You must provide the gender id'),
+    check('rate').exists().withMessage('You must provide the ratings')
 ], async (req, res) => {
     // validating data
     const errors = validationResult(req);
@@ -129,9 +135,9 @@ router.put('/upd-post', verifyToken, [
         return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
     } else {
         // deformating all data
-        const { categoryid, datecreated, description, linktoimage, instock, discountexp, onsale, saleexp, amount, postid } = req.body;
+        const { categoryid, datecreated, description, linktoimage, instock, discountexp, onsale, saleexp, amount, postid, genderid, rate } = req.body;
         // when everything is okay
-        await updPostController(categoryid, datecreated, description, linktoimage, instock, discountexp, onsale, saleexp, amount, postid).then(response => {
+        await updPostController(categoryid, datecreated, description, linktoimage, instock, discountexp, onsale, saleexp, amount, genderid, rate, postid).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);
@@ -166,6 +172,22 @@ router.delete('/del-post/:postid', verifyToken, [
             console.log(e);
         })
     }
+});
+
+// get posts which are on sale
+router.get('/get-posts-on-sale', verifyToken, async (req, res) => {
+    // when everything is okay
+    await getPostsOnSaleController().then(response => {
+        return res.json({ response })
+    })
+});
+
+// get posts which are on sale
+router.get('/get-posts-on-discount', verifyToken, async (req, res) => {
+    // when everything is okay
+    await getPostsOnDiscountController().then(response => {
+        return res.json({ response })
+    })
 });
 
 // verify token
