@@ -431,6 +431,65 @@ module.exports.getDiscountedPostsCountController = async () => {
 }
 
 
+//a function to get gender 
+module.exports.getGenderController = async (offset, order, sortby) => {
+    let response;
+    getGenderQuery = {
+        text: 'SELECT id,name from gender'
+    }
+    await client.query(getGenderQuery).then(async res => {
+        if (res.rows.length <= 0) {
+            response = {
+                error: 1,
+                message: 'you have no gender in db'
+            }
+        } else {
+            response = {
+                error: 0,
+                message: 'you have set ' + res.rows.length + ' genders',
+                data: res.rows
+            }
+        }
+    }).catch(e => {
+        console.log(e)
+        response = {
+            error: 1,
+            message: "404"
+        };
+    });
+    return response;
+}
+
+//a function to get gender 
+module.exports.getCategoryController = async (offset, order, sortby) => {
+    let response;
+    getGenderQuery = {
+        text: 'SELECT id,name from category'
+    }
+    await client.query(getGenderQuery).then(async res => {
+        if (res.rows.length <= 0) {
+            response = {
+                error: 1,
+                message: 'you have no categories in db'
+            }
+        } else {
+            response = {
+                error: 0,
+                message: 'you have set ' + res.rows.length + ' categories',
+                data: res.rows
+            }
+        }
+    }).catch(e => {
+        console.log(e)
+        response = {
+            error: 1,
+            message: "404"
+        };
+    });
+    return response;
+}
+
+
 // module.exports.getMonthlyBudgetsController = async (userid, timestamp) => {
 //     let response;
 //     userexists = await checkIfUserExists(userid);

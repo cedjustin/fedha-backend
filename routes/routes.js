@@ -15,7 +15,9 @@ const {
     getPostsOnDiscountController,
     getPostsCountController,
     getSalesPostsCountController,
-    getDiscountedPostsCountController
+    getDiscountedPostsCountController,
+    getGenderController,
+    getCategoryController
 } = require('../controller/controller');
 
 
@@ -152,19 +154,6 @@ router.put('/upd-post', verifyToken, [
 });
 
 // get posts 
-router.get('/get-posts', verifyToken, async (req, res) => {
-
-    // deconstracting data
-    const { sortby, offset, order } = req.headers;
-    console.log(req.headers);
-
-    // when everything is okay
-    await getPostsController(offset, order, sortby).then(response => {
-        return res.json({ response })
-    })
-});
-
-// get posts 
 router.delete('/del-post/:postid', verifyToken, [
     check('postid').exists().withMessage('you must provide an id')
 ], async (req, res) => {
@@ -185,8 +174,21 @@ router.delete('/del-post/:postid', verifyToken, [
     }
 });
 
+// get posts 
+router.get('/get-posts', async (req, res) => {
+
+    // deconstracting data
+    const { sortby, offset, order } = req.headers;
+    console.log(req.headers);
+
+    // when everything is okay
+    await getPostsController(offset, order, sortby).then(response => {
+        return res.json({ response })
+    })
+});
+
 // get posts which are on sale
-router.get('/get-posts-on-sale', verifyToken, async (req, res) => {
+router.get('/get-posts-on-sale', async (req, res) => {
 
     // deconstracting data
     const { sortby, offset, order } = req.headers;
@@ -198,7 +200,7 @@ router.get('/get-posts-on-sale', verifyToken, async (req, res) => {
 });
 
 // get posts which are on sale
-router.get('/get-posts-on-discount', verifyToken, async (req, res) => {
+router.get('/get-posts-on-discount', async (req, res) => {
 
     // deconstracting data
     const { sortby, offset, order } = req.headers;
@@ -210,8 +212,7 @@ router.get('/get-posts-on-discount', verifyToken, async (req, res) => {
 });
 
 // get all products count
-router.get('/all-posts-count', verifyToken, async (req, res) => {
-
+router.get('/all-posts-count', async (req, res) => {
     // when everything is okay
     await getPostsCountController().then(response => {
         return res.json({ response })
@@ -219,8 +220,7 @@ router.get('/all-posts-count', verifyToken, async (req, res) => {
 })
 
 // get all sales products count
-router.get('/sales-posts-count', verifyToken, async (req, res) => {
-
+router.get('/sales-posts-count', async (req, res) => {
     // when everything is okay
     await getSalesPostsCountController().then(response => {
         return res.json({ response })
@@ -228,10 +228,25 @@ router.get('/sales-posts-count', verifyToken, async (req, res) => {
 })
 
 // get all sales products count
-router.get('/discounted-posts-count', verifyToken, async (req, res) => {
-
+router.get('/discounted-posts-count', async (req, res) => {
     // when everything is okay
     await getDiscountedPostsCountController().then(response => {
+        return res.json({ response })
+    })
+})
+
+// get all gender
+router.get('/get-gender', async (req, res) => {
+    // when everything is okay
+    await getGenderController().then(response => {
+        return res.json({ response })
+    })
+})
+
+// get all category
+router.get('/get-category', async (req, res) => {
+    // when everything is okay
+    await getCategoryController().then(response => {
         return res.json({ response })
     })
 })
