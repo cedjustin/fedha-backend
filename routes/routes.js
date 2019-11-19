@@ -17,7 +17,9 @@ const {
     getSalesPostsCountController,
     getDiscountedPostsCountController,
     getGenderController,
-    getCategoryController
+    getCategoryController,
+    addGenderController,
+    addCategoryController
 } = require('../controller/controller');
 
 
@@ -250,6 +252,48 @@ router.get('/get-category', async (req, res) => {
         return res.json({ response })
     })
 })
+
+// add a new gender 
+router.post('/add-gender', verifyToken, [
+    check('name').exists().withMessage('You must provide a gender')
+], async (req, res) => {
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(JSON.stringify(req.body));
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { name } = req.body;
+        // when everything is okay
+        await addGenderController(name).then(response => {
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
+
+// add a new category 
+router.post('/add-category', verifyToken, [
+    check('name').exists().withMessage('You must provide a category')
+], async (req, res) => {
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(JSON.stringify(req.body));
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { name } = req.body;
+        // when everything is okay
+        await addCategoryController(name).then(response => {
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
 
 // verify token
 function verifyToken(req, res, next) {

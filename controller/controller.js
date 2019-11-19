@@ -325,7 +325,7 @@ module.exports.getPostsOnDiscountController = async (offset, order, sortby) => {
         } else {
             response = {
                 error: 0,
-                message: 'you have set ' + res.rows.count+ ' posts',
+                message: 'you have set ' + res.rows.count + ' posts',
                 data: res.rows
             }
         }
@@ -375,7 +375,7 @@ module.exports.getSalesPostsCountController = async () => {
     let response;
     getPostsQuery = {
         text: 'SELECT COUNT(1) FROM posts WHERE onsale = $1',
-        values:['1']
+        values: ['1']
     }
     await client.query(getPostsQuery).then(async res => {
         if (res.rows.length <= 0) {
@@ -405,7 +405,7 @@ module.exports.getDiscountedPostsCountController = async () => {
     let response;
     getPostsQuery = {
         text: 'SELECT COUNT(1) FROM posts WHERE discountexp != $1',
-        values:['0']
+        values: ['0']
     }
     await client.query(getPostsQuery).then(async res => {
         if (res.rows.length <= 0) {
@@ -486,6 +486,88 @@ module.exports.getCategoryController = async (offset, order, sortby) => {
             message: "404"
         };
     });
+    return response;
+}
+
+// a function to add gender
+module.exports.addGenderController = async (name) => {
+    let name = name.trim();
+    let response
+    query = 'SELECT COUNT(1) FROM gender WHERE name=$1';
+    values = [name];
+    await client.query(query, values).then(async res => {
+        if (res.rows[0].count == 1) {
+            response = {
+                error: 1,
+                message: 'gender already exists'
+            }
+        } else {
+            let insertQuery = {
+                text: 'INSERT INTO gender(name) VALUES ($1) RETURNING *',
+                values: [name]
+            }
+            await client.query(insertQuery).then(res => {
+                response = {
+                    error: 0,
+                    message: 'gender added',
+                    data: res.rows
+                }
+            }).catch(err => {
+                response = {
+                    error: 1,
+                    message: 'gender not added'
+                }
+                console.log(err);
+            })
+        }
+    }).catch(e => {
+        response = {
+            error: 1,
+            message: '404'
+        }
+        console.log(e);
+    })
+    return response;
+}
+
+// a function to add category
+module.exports.addCategoryController = async (name) => {
+    let name = name.trim();
+    let response
+    query = 'SELECT COUNT(1) FROM category WHERE name=$1';
+    values = [name];
+    await client.query(query, values).then(async res => {
+        if (res.rows[0].count == 1) {
+            response = {
+                error: 1,
+                message: 'category already exists'
+            }
+        } else {
+            let insertQuery = {
+                text: 'INSERT INTO gender(name) VALUES ($1) RETURNING *',
+                values: [name]
+            }
+            await client.query(insertQuery).then(res => {
+                response = {
+                    error: 0,
+                    message: 'gender added',
+                    data: res.rows
+                }
+            }).catch(err => {
+                response = {
+                    error: 1,
+                    message: 'gender not added'
+                }
+                console.log(err);
+            })
+        }
+    }).catch(e => {
+        response = {
+            error: 1,
+            message: '404'
+        }
+        console.log(e);
+    })
     return response;
 }
 
