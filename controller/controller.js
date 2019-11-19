@@ -464,7 +464,7 @@ module.exports.getGenderController = async (offset, order, sortby) => {
 module.exports.getCategoryController = async (offset, order, sortby) => {
     let response;
     getGenderQuery = {
-        text: 'SELECT id,name from category'
+        text: 'SELECT id,name from categories'
     }
     await client.query(getGenderQuery).then(async res => {
         if (res.rows.length <= 0) {
