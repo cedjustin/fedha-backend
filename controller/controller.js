@@ -491,7 +491,7 @@ module.exports.getCategoryController = async (offset, order, sortby) => {
 
 // a function to add gender
 module.exports.addGenderController = async (name) => {
-    let name = name.trim();
+    name = name.trim();
     let response
     query = 'SELECT COUNT(1) FROM gender WHERE name=$1';
     values = [name];
@@ -532,7 +532,7 @@ module.exports.addGenderController = async (name) => {
 
 // a function to add category
 module.exports.addCategoryController = async (name) => {
-    let name = name.trim();
+    name = name.trim();
     let response
     query = 'SELECT COUNT(1) FROM category WHERE name=$1';
     values = [name];
