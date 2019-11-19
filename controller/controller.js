@@ -571,6 +571,36 @@ module.exports.addCategoryController = async (name) => {
     return response;
 }
 
+// a function to delete gender
+module.exports.delGenderController = async (id) => {
+    let text = 'DELETE FROM gender WHERE id=$1';
+    values = [id];
+    await client.query(text, values).then(async res => {
+        response = this.getGenderController();
+    }).catch(e => {
+        response = {
+            error: 1,
+            message: "gender not deleted"
+        }
+        console.log(e);
+    })
+}
+
+// a function to delete category
+module.exports.delCategoryController = async (id) => {
+    let text = 'DELETE FROM categories WHERE id=$1';
+    values = [id];
+    await client.query(text, values).then(async res => {
+        response = this.getCategoryController();
+    }).catch(e => {
+        response = {
+            error: 1,
+            message: "category not deleted"
+        }
+        console.log(e);
+    })
+}
+
 
 // module.exports.getMonthlyBudgetsController = async (userid, timestamp) => {
 //     let response;

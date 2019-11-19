@@ -19,7 +19,9 @@ const {
     getGenderController,
     getCategoryController,
     addGenderController,
-    addCategoryController
+    addCategoryController,
+    delGenderController,
+    delCategoryController
 } = require('../controller/controller');
 
 
@@ -288,6 +290,50 @@ router.post('/add-category', verifyToken, [
         const { name } = req.body;
         // when everything is okay
         await addCategoryController(name).then(response => {
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
+
+
+// delete a gender 
+router.delete('/del-gender/:id', verifyToken, [
+    check('id').exists().withMessage('You must provide an id')
+], async (req, res) => {
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(JSON.stringify(req.body));
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { id } = req.params;
+        // when everything is okay
+        await delGenderController(id).then(response => {
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
+
+
+// delete a category 
+router.delete('/del-category/:id', verifyToken, [
+    check('id').exists().withMessage('You must provide an id')
+], async (req, res) => {
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(JSON.stringify(req.body));
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { id } = req.params;
+        // when everything is okay
+        await delCategoryController(id).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);
