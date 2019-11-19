@@ -534,7 +534,7 @@ module.exports.addGenderController = async (name) => {
 module.exports.addCategoryController = async (name) => {
     name = name.trim();
     let response
-    query = 'SELECT COUNT(1) FROM category WHERE name=$1';
+    query = 'SELECT COUNT(1) FROM categories WHERE name=$1';
     values = [name];
     await client.query(query, values).then(async res => {
         if (res.rows[0].count == 1) {
@@ -544,19 +544,19 @@ module.exports.addCategoryController = async (name) => {
             }
         } else {
             let insertQuery = {
-                text: 'INSERT INTO gender(name) VALUES ($1) RETURNING *',
+                text: 'INSERT INTO categories(name) VALUES ($1) RETURNING *',
                 values: [name]
             }
             await client.query(insertQuery).then(res => {
                 response = {
                     error: 0,
-                    message: 'gender added',
+                    message: 'category added',
                     data: res.rows
                 }
             }).catch(err => {
                 response = {
                     error: 1,
-                    message: 'gender not added'
+                    message: 'category not added'
                 }
                 console.log(err);
             })
