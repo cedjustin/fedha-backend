@@ -576,7 +576,10 @@ module.exports.delGenderController = async (id) => {
     let text = 'DELETE FROM gender WHERE id=$1';
     values = [id];
     await client.query(text, values).then(async res => {
-        response = this.getGenderController();
+        response = {
+            error: 0,
+            message: 'gender deleted'
+        };
     }).catch(e => {
         response = {
             error: 1,
@@ -591,7 +594,10 @@ module.exports.delCategoryController = async (id) => {
     let text = 'DELETE FROM categories WHERE id=$1';
     values = [id];
     await client.query(text, values).then(async res => {
-        response = this.getCategoryController();
+        response = {
+            error: 0,
+            message: 'category deleted'
+        };
     }).catch(e => {
         response = {
             error: 1,
