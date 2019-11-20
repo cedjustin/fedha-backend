@@ -588,7 +588,7 @@ module.exports.delGenderController = async (id) => {
         }
         console.log(e);
     })
-    return response;
+    return reponse;
 }
 
 // a function to delete category
@@ -605,6 +605,46 @@ module.exports.delCategoryController = async (id) => {
         response = {
             error: 1,
             message: "category not deleted"
+        }
+        console.log(e);
+    })
+    return response;
+}
+
+// a function to update category
+module.exports.updCategoryController = async (id,name) => {
+    let response;
+    let text = 'UPDATE categories SET name=$2 WHERE id=$1';
+    values = [id,name];
+    await client.query(text, values).then(async res => {
+        response = {
+            error: 0,
+            message: 'category updated'
+        }
+    }).catch(e => {
+        response = {
+            error: 1,
+            message: "category not updated"
+        }
+        console.log(e);
+    })
+    return response;
+}
+
+// a function to update gender
+module.exports.updGenderController = async (id,name) => {
+    let response;
+    let text = 'UPDATE gender SET name=$2 WHERE id=$1';
+    values = [id,name];
+    await client.query(text, values).then(async res => {
+        response = {
+            error: 0,
+            message: 'gender updated'
+        }
+    }).catch(e => {
+        response = {
+            error: 1,
+            message: "gender not updated"
         }
         console.log(e);
     })

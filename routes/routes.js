@@ -21,12 +21,14 @@ const {
     addGenderController,
     addCategoryController,
     delGenderController,
-    delCategoryController
+    delCategoryController,
+    updCategoryController,
+    updGenderController
 } = require('../controller/controller');
 
 
 // a function to check if token hasn't expired
-router.get('/token-checker',verifyToken,(req,res)=>{
+router.get('/token-checker', verifyToken, (req, res) => {
     return res.json({
         error: 0,
         message: 'proceed'
@@ -340,6 +342,50 @@ router.delete('/del-category/:id', verifyToken, [
         const { id } = req.params;
         // when everything is okay
         await delCategoryController(id).then(response => {
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
+
+
+// update a gender 
+router.put('/upd-gender', verifyToken, [
+    check('id').exists().withMessage('You must provide an id'),
+    check('name').exists().withMessage('You must provide a name')
+], async (req, res) => {
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { id, name } = req.body;
+        // when everything is okay
+        await updGenderController(id, name).then(response => {
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
+
+
+// update a category 
+router.put('/upd-category', verifyToken, [
+    check('id').exists().withMessage('You must provide an id'),
+    check('name').exists().withMessage('You must provide a name')
+], async (req, res) => {
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { id, name } = req.body;
+        // when everything is okay
+        await updCategoryController(id, name).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);
