@@ -573,13 +573,11 @@ module.exports.addCategoryController = async (name) => {
 
 // a function to delete gender
 module.exports.delGenderController = async (id) => {
+    let reponse;
     let text = 'DELETE FROM gender WHERE id=$1';
     values = [id];
     await client.query(text, values).then(async res => {
-        response = {
-            error: 0,
-            message: 'gender deleted'
-        };
+        response = await this.getGenderController();
     }).catch(e => {
         response = {
             error: 1,
@@ -587,17 +585,16 @@ module.exports.delGenderController = async (id) => {
         }
         console.log(e);
     })
+    return response;
 }
 
 // a function to delete category
 module.exports.delCategoryController = async (id) => {
+    let response;
     let text = 'DELETE FROM categories WHERE id=$1';
     values = [id];
     await client.query(text, values).then(async res => {
-        response = {
-            error: 0,
-            message: 'category deleted'
-        };
+        response = await this.getCategoryController();
     }).catch(e => {
         response = {
             error: 1,
@@ -605,6 +602,7 @@ module.exports.delCategoryController = async (id) => {
         }
         console.log(e);
     })
+    return response;
 }
 
 

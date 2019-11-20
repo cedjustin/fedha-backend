@@ -25,6 +25,15 @@ const {
 } = require('../controller/controller');
 
 
+// a function to check if token hasn't expired
+router.get('/token-checker',verifyToken,(req,res)=>{
+    return res.json({
+        error: 0,
+        message: 'proceed'
+    })
+})
+
+
 router.post('/login', [
     check('username').exists().withMessage('You must provide a username'),
     check('password').exists().withMessage('You must provide a password'),
@@ -283,7 +292,6 @@ router.post('/add-category', verifyToken, [
     // validating data
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        console.log(JSON.stringify(req.body));
         return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
     } else {
         // deformating all data
@@ -305,7 +313,6 @@ router.delete('/del-gender/:id', verifyToken, [
     // validating data
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        console.log(JSON.stringify(req.body));
         return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
     } else {
         // deformating all data
@@ -327,7 +334,6 @@ router.delete('/del-category/:id', verifyToken, [
     // validating data
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        console.log(JSON.stringify(req.body));
         return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
     } else {
         // deformating all data
