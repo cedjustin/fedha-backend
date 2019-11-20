@@ -231,7 +231,10 @@ module.exports.delPostController = async (postId) => {
     let text = 'DELETE FROM posts WHERE id=$1';
     values = [postId];
     await client.query(text, values).then(async res => {
-        response = await this.getPostsController();
+        response = {
+            error: 0,
+            message: "posts deleted"
+        };
     }).catch(e => {
         response = {
             error: 1,
