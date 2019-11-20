@@ -23,7 +23,8 @@ const {
     delGenderController,
     delCategoryController,
     updCategoryController,
-    updGenderController
+    updGenderController,
+    updPostOnSaleController
 } = require('../controller/controller');
 
 
@@ -123,7 +124,7 @@ router.post('/add-post', verifyToken, [
         let saleexp = 0;
         let rate = 0;
         // deformating all data
-        const { categoryid, description, linktoimage, instock, amount, genderid} = req.body;
+        const { categoryid, description, linktoimage, instock, amount, genderid } = req.body;
         // when everything is okay
         await addPostController(categoryid, description, linktoimage, instock, discountexp, onsale, saleexp, amount, genderid, rate).then(response => {
             return res.json({ response });
@@ -300,6 +301,28 @@ router.post('/add-category', verifyToken, [
         const { name } = req.body;
         // when everything is okay
         await addCategoryController(name).then(response => {
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
+
+
+// put on sale
+router.put('/upd-put-on-sale', verifyToken, [
+    check('postid').exists().withMessage('You must provide a postid'),
+    check('days').exists().withMessage('You must provide a days')
+], async (req, res) => {
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { postid, days } = req.body;
+        // when everything is okay
+        await updPostOnSaleController(postid, days).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);

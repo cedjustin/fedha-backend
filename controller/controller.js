@@ -5,6 +5,8 @@ const {
 const bcrypt = require('bcryptjs');
 const saltRounds = 10;
 
+const moment = require('moment');
+
 
 
 // configuring the db
@@ -22,8 +24,7 @@ client.connect().then(() => console.log('db connected')).catch(e => console.log(
 // start of controllers
 
 let _getTimeStamp = async () => {
-    const today = new Date();
-    return today;
+    return moment().format();
 }
 
 // function for checking if the user exists and SignIn
@@ -181,6 +182,30 @@ module.exports.addPostController = async (categoryid, description, linkToImage, 
             };
         })
     }
+    return response;
+}
+
+
+// function to put post on sale
+module.exports.updPostOnSaleController = async (postid, days) => {
+    const saleexp = moment().add(days, 'days');
+    let response;
+    const updatePostQuery = {
+        text: 'UPDATE posts SET onsale=$2,saleexp=$3 WHERE id=$1',
+        values: [postid, '1', saleexp]
+    }
+    await client.query(updatePostQuery).then(async res => {
+        response = {
+            error: 0,
+            message: 'post putted on sale'
+        };
+    }).catch(e => {
+        console.log(e);
+        response = {
+            error: 1,
+            message: "404"
+        };
+    })
     return response;
 }
 
@@ -609,10 +634,10 @@ module.exports.delCategoryController = async (id) => {
 }
 
 // a function to update category
-module.exports.updCategoryController = async (id,name) => {
+module.exports.updCategoryController = async (id, name) => {
     let response;
     let text = 'UPDATE categories SET name=$2 WHERE id=$1';
-    values = [id,name];
+    values = [id, name];
     await client.query(text, values).then(async res => {
         response = {
             error: 0,
@@ -629,10 +654,10 @@ module.exports.updCategoryController = async (id,name) => {
 }
 
 // a function to update gender
-module.exports.updGenderController = async (id,name) => {
+module.exports.updGenderController = async (id, name) => {
     let response;
     let text = 'UPDATE gender SET name=$2 WHERE id=$1';
-    values = [id,name];
+    values = [id, name];
     await client.query(text, values).then(async res => {
         response = {
             error: 0,
