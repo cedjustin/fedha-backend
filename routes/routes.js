@@ -109,12 +109,8 @@ router.post('/add-post', verifyToken, [
     check('description').exists().withMessage('You must provide a description'),
     check('linktoimage').exists().withMessage('You must provide a linkToImage'),
     check('instock').exists().withMessage('You must provide a inStock'),
-    check('discountexp').exists().withMessage('You must provide a discountexp'),
-    check('onsale').exists().withMessage('You must provide if product is on sale'),
-    check('saleexp').exists().withMessage('You must provide when product sale will expire'),
     check('amount').exists().withMessage('You must provide the amount'),
     check('genderid').exists().withMessage('You must provide the gender id'),
-    check('rate').exists().withMessage('You must provide the ratings')
 ], async (req, res) => {
     // validating data
     const errors = validationResult(req);
@@ -122,8 +118,12 @@ router.post('/add-post', verifyToken, [
         console.log(JSON.stringify(req.body));
         return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
     } else {
+        let discountexp = 0;
+        let onsale = 0;
+        let saleexp = 0;
+        let rate = 0;
         // deformating all data
-        const { categoryid, description, linktoimage, instock, discountexp, onsale, saleexp, amount, genderid, rate } = req.body;
+        const { categoryid, description, linktoimage, instock, amount, genderid} = req.body;
         // when everything is okay
         await addPostController(categoryid, description, linktoimage, instock, discountexp, onsale, saleexp, amount, genderid, rate).then(response => {
             return res.json({ response });
