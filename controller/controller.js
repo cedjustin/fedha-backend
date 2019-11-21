@@ -232,7 +232,7 @@ module.exports.updPostFromSaleController = async (postid) => {
 }
 
 // function to update all budgets
-module.exports.updPostController = async (categoryid, datecreated, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, genderId, rate, postId, sortby, offset, order) => {
+module.exports.updPostController = async (categoryid, datecreated, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, genderId, rate, postId) => {
     getTimeStamp = await _getTimeStamp();
     categoryid = categoryid.trim();
     datecreated = datecreated.trim();
@@ -259,7 +259,10 @@ module.exports.updPostController = async (categoryid, datecreated, description, 
             values: [categoryid, getTimeStamp, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, postId]
         }
         await client.query(updatePostQuery).then(async res => {
-            response = await this.getPostsController(sortby, offset, order);
+            response = {
+                error: 0,
+                message: 'post updated'
+            };
         }).catch(e => {
             console.log(e);
             response = {

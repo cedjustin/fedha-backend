@@ -148,10 +148,7 @@ router.put('/upd-post', verifyToken, [
     check('amount').exists().withMessage('You must provide the amount'),
     check('postid').exists().withMessage('You must provide the postid'),
     check('genderid').exists().withMessage('You must provide the gender id'),
-    check('rate').exists().withMessage('You must provide the ratings'),
-    check('sortby').exists().withMessage('You must provide the what to sort by'),
-    check('offset').exists().withMessage('You must provide the offset'),
-    check('order').exists().withMessage('You must provide the order of how data are sorted')
+    check('rate').exists().withMessage('You must provide the ratings')
 ], async (req, res) => {
     // validating data
     const errors = validationResult(req);
@@ -160,9 +157,9 @@ router.put('/upd-post', verifyToken, [
         return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
     } else {
         // deformating all data
-        const { categoryid, datecreated, description, linktoimage, instock, discountexp, onsale, saleexp, amount, postid, genderid, rate, sortby, offset, order } = req.body;
+        const { categoryid, datecreated, description, linktoimage, instock, discountexp, onsale, saleexp, amount, postid, genderid, rate } = req.body;
         // when everything is okay
-        await updPostController(categoryid, datecreated, description, linktoimage, instock, discountexp, onsale, saleexp, amount, genderid, rate, postid, sortby, offset, order).then(response => {
+        await updPostController(categoryid, datecreated, description, linktoimage, instock, discountexp, onsale, saleexp, amount, genderid, rate, postid).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);
