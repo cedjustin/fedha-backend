@@ -298,7 +298,7 @@ module.exports.delPostController = async (postId) => {
 module.exports.getPostsController = async (offset, order, sortby) => {
     let response;
     getPostsQuery = {
-        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount,rate FROM posts ORDER BY ' + sortby + ' ' + order + ' OFFSET $1 FETCH FIRST 10 ROWS ONLY',
+        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount,rate,genderid FROM posts ORDER BY ' + sortby + ' ' + order + ' OFFSET $1 FETCH FIRST 10 ROWS ONLY',
         values: [offset]
     }
     await client.query(getPostsQuery).then(async res => {
