@@ -245,7 +245,6 @@ module.exports.updPostController = async (categoryid, datecreated, description, 
     amount = amount.trim();
     postId = postId.trim();
     genderId = genderId.trim();
-    rate = rate.trim();
     let response;
     const allPosts = await this.getPostsController();
     if (allPosts.error == 1 && allPosts.message == 'there are no posts') {
