@@ -137,7 +137,7 @@ router.post('/add-post', verifyToken, [
 
 // upd a new post 
 router.put('/upd-post', verifyToken, [
-    check('categoryid').exists().withMessage('You must provide a a category id'),
+    check('catid').exists().withMessage('You must provide a a category id'),
     check('datecreated').exists().withMessage('You must provide a datecreated'),
     check('description').exists().withMessage('You must provide a description'),
     check('linktoimage').exists().withMessage('You must provide a linkToImage'),
