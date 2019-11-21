@@ -153,7 +153,7 @@ router.put('/upd-post', verifyToken, [
     // validating data
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        console.log(JSON.stringify(req.body));
+        console.log(JSON.stringify(errors));
         return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
     } else {
         // deformating all data
