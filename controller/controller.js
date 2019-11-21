@@ -232,23 +232,13 @@ module.exports.updPostFromSaleController = async (postid) => {
 }
 
 // function to update all budgets
-module.exports.updPostController = async (categoryid, datecreated, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, genderId, rate, postId) => {
-    getTimeStamp = await _getTimeStamp();
-    categoryid = categoryid.trim();
-    datecreated = datecreated.trim();
+module.exports.updPostController = async (categoryid, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, genderId, rate, postId) => {
     description = description.trim();
     linkToImage = linkToImage.replace('dl=0', 'raw=1');
-    inStock = inStock.trim();
-    discountexp = discountexp.trim();
-    onsale = onsale.trim();
-    saleexp = saleexp.trim();
-    amount = amount.trim();
-    postId = postId.trim();
-    genderId = genderId.trim();
     let response;
     let updatePostQuery = {
-        text: 'UPDATE posts SET catid=$1,datecreated=$2,description=$3,linktoimage=$4,instock=$5,discountexp=$6,onsale=$7,saleexp=$8,amount=$9 WHERE id=$10',
-        values: [categoryid, getTimeStamp, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, postId]
+        text: 'UPDATE posts SET catid=$1,description=$2,linktoimage=$3,instock=$4,discountexp=$5,onsale=$6,saleexp=$7,amount=$8,rate=$9 WHERE id=$10',
+        values: [categoryid, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, rate,postId]
     }
     await client.query(updatePostQuery).then(async res => {
         response = {
