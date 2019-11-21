@@ -24,7 +24,8 @@ const {
     delCategoryController,
     updCategoryController,
     updGenderController,
-    updPostOnSaleController
+    updPostOnSaleController,
+    updPostFromSaleController
 } = require('../controller/controller');
 
 
@@ -330,6 +331,25 @@ router.put('/upd-put-on-sale', verifyToken, [
     }
 });
 
+// put on sale
+router.put('/upd-rm-on-sale', verifyToken, [
+    check('postid').exists().withMessage('You must provide a postid'),
+], async (req, res) => {
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { postid, days } = req.body;
+        // when everything is okay
+        await updPostFromSaleController(postid).then(response => {
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
 
 // delete a gender 
 router.delete('/del-gender/:id', verifyToken, [
@@ -415,6 +435,7 @@ router.put('/upd-category', verifyToken, [
         })
     }
 });
+
 
 // verify token
 function verifyToken(req, res, next) {

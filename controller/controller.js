@@ -209,6 +209,28 @@ module.exports.updPostOnSaleController = async (postid, days) => {
     return response;
 }
 
+// function to remove post on sale
+module.exports.updPostFromSaleController = async (postid) => {
+    let response;
+    const updatePostQuery = {
+        text: 'UPDATE posts SET onsale=$2,saleexp=$3 WHERE id=$1',
+        values: [postid, '0', '0']
+    }
+    await client.query(updatePostQuery).then(async res => {
+        response = {
+            error: 0,
+            message: 'post removed on sale'
+        };
+    }).catch(e => {
+        console.log(e);
+        response = {
+            error: 1,
+            message: "404"
+        };
+    })
+    return response;
+}
+
 // function to update all budgets
 module.exports.updPostController = async (categoryid, datecreated, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, genderId, rate, postId, sortby, offset, order) => {
     getTimeStamp = await _getTimeStamp();
