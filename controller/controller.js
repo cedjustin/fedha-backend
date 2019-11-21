@@ -246,30 +246,22 @@ module.exports.updPostController = async (categoryid, datecreated, description, 
     postId = postId.trim();
     genderId = genderId.trim();
     let response;
-    const allPosts = await this.getPostsController();
-    if (allPosts.error == 1 && allPosts.message == 'there are no posts') {
+    let updatePostQuery = {
+        text: 'UPDATE posts SET catid=$1,datecreated=$2,description=$3,linktoimage=$4,instock=$5,discountexp=$6,onsale=$7,saleexp=$8,amount=$9 WHERE id=$10',
+        values: [categoryid, getTimeStamp, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, postId]
+    }
+    await client.query(updatePostQuery).then(async res => {
+        response = {
+            error: 0,
+            message: 'post updated'
+        };
+    }).catch(e => {
+        console.log(e);
         response = {
             error: 1,
-            message: allPosts.message
-        }
-    } else {
-        let updatePostQuery = {
-            text: 'UPDATE posts SET catid=$1,datecreated=$2,description=$3,linktoimage=$4,instock=$5,discountexp=$6,onsale=$7,saleexp=$8,amount=$9 WHERE id=$10',
-            values: [categoryid, getTimeStamp, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, postId]
-        }
-        await client.query(updatePostQuery).then(async res => {
-            response = {
-                error: 0,
-                message: 'post updated'
-            };
-        }).catch(e => {
-            console.log(e);
-            response = {
-                error: 1,
-                message: "404"
-            };
-        })
-    }
+            message: "404"
+        };
+    })
     return response;
 }
 
