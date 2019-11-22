@@ -460,7 +460,7 @@ module.exports.getDiscountedPostsCountController = async () => {
 
 
 //a function to get gender 
-module.exports.getGenderController = async (offset, order, sortby) => {
+module.exports.getGenderController = async () => {
     let response;
     getGenderQuery = {
         text: 'SELECT id,name from gender'
@@ -475,6 +475,35 @@ module.exports.getGenderController = async (offset, order, sortby) => {
             response = {
                 error: 0,
                 message: 'you have set ' + res.rows.length + ' genders',
+                data: res.rows
+            }
+        }
+    }).catch(e => {
+        console.log(e)
+        response = {
+            error: 1,
+            message: "404"
+        };
+    });
+    return response;
+}
+
+//a function to get colors 
+module.exports.getColorsController = async () => {
+    let response;
+    getGenderQuery = {
+        text: 'SELECT id,name,colorcode from colors'
+    }
+    await client.query(getGenderQuery).then(async res => {
+        if (res.rows.length <= 0) {
+            response = {
+                error: 1,
+                message: 'you have no colors in db'
+            }
+        } else {
+            response = {
+                error: 0,
+                message: 'you have set ' + res.rows.length + ' colors',
                 data: res.rows
             }
         }

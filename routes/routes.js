@@ -18,6 +18,7 @@ const {
     getDiscountedPostsCountController,
     getGenderController,
     getCategoryController,
+    getColorsController,
     addGenderController,
     addCategoryController,
     delGenderController,
@@ -261,6 +262,14 @@ router.get('/get-gender', async (req, res) => {
 router.get('/get-category', async (req, res) => {
     // when everything is okay
     await getCategoryController().then(response => {
+        return res.json({ response })
+    })
+})
+
+// get all colors
+router.get('/get-colors', async (req, res) => {
+    // when everything is okay
+    await getColorsController().then(response => {
         return res.json({ response })
     })
 })
