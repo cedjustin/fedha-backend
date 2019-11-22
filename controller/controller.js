@@ -237,8 +237,8 @@ module.exports.updPostController = async (categoryid, description, linkToImage, 
     linkToImage = linkToImage.replace('dl=0', 'raw=1');
     let response;
     let updatePostQuery = {
-        text: 'UPDATE posts SET catid=$1,description=$2,linktoimage=$3,instock=$4,discountexp=$5,onsale=$6,saleexp=$7,amount=$8,rate=$9 WHERE id=$10',
-        values: [categoryid, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, rate,postId]
+        text: 'UPDATE posts SET catid=$1,description=$2,linktoimage=$3,instock=$4,discountexp=$5,onsale=$6,saleexp=$7,amount=$8,rate=$9,genderid=$10 WHERE id=$11',
+        values: [categoryid, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, rate, genderId, postId]
     }
     await client.query(updatePostQuery).then(async res => {
         response = {
