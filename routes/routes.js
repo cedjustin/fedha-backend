@@ -118,7 +118,6 @@ router.post('/add-post', verifyToken, [
     // validating data
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        console.log(JSON.stringify(req.body));
         return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
     } else {
         let discountexp = 0;
@@ -127,8 +126,14 @@ router.post('/add-post', verifyToken, [
         let rate = 0;
         // deformating all data
         const { categoryid, description, linktoimage, instock, amount, genderid } = req.body;
+        linktoimage.forEach(color => {
+            color.pictures.forEach(picture=>{
+                picture.linktoimage = picture.linktoimage.replace('dl=0', 'raw=1');
+            });
+        });
+        const newlinktoimage = JSON.stringify(linktoimage);
         // when everything is okay
-        await addPostController(categoryid, description, linktoimage, instock, discountexp, onsale, saleexp, amount, genderid, rate).then(response => {
+        await addPostController(categoryid, description, newlinktoimage, instock, discountexp, onsale, saleexp, amount, genderid, rate).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);

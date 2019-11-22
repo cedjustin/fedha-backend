@@ -154,7 +154,6 @@ module.exports.addPostController = async (categoryid, description, linkToImage, 
     getTimeStamp = await _getTimeStamp();
     categoryid = categoryid;
     description = description.trim();
-    linkToImage = linkToImage.replace('dl=0', 'raw=1');
     genderId = genderId.trim();
     let response;
     let postExists = await checkIfPostExists(categoryid, description, amount);
