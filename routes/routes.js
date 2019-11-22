@@ -157,7 +157,7 @@ router.put('/upd-post', verifyToken, [
         return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
     } else {
         // deformating all data
-        const { catid, datecreated, description, linktoimage, instock, discountexp, onsale, saleexp, amount, id, genderid, rate } = req.body;
+        const { catid, description, linktoimage, instock, discountexp, onsale, saleexp, amount, id, genderid, rate } = req.body;
         // when everything is okay
         await updPostController(catid, description, linktoimage, instock, discountexp, onsale, saleexp, amount, genderid, rate, id).then(response => {
             return res.json({ response });
