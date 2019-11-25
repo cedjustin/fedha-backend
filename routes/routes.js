@@ -8,9 +8,10 @@ const {
     signInController,
     signUpController,
     addPostController,
+    addGenderController,
+    addColorController,
+    addCategoryController,
     getPostsController,
-    updPostController,
-    delPostController,
     getPostsOnSaleController,
     getPostsOnDiscountController,
     getPostsCountController,
@@ -19,14 +20,15 @@ const {
     getGenderController,
     getCategoryController,
     getColorsController,
-    addGenderController,
-    addCategoryController,
+    delPostController,
     delGenderController,
     delCategoryController,
     updCategoryController,
     updGenderController,
     updPostOnSaleController,
-    updPostFromSaleController
+    updPostFromSaleController,
+    updPostController,
+    updColorController
 } = require('../controller/controller');
 
 
@@ -127,7 +129,7 @@ router.post('/add-post', verifyToken, [
         // deformating all data
         const { categoryid, description, linktoimage, instock, amount, genderid } = req.body;
         linktoimage.forEach(color => {
-            color.pictures.forEach(picture=>{
+            color.pictures.forEach(picture => {
                 picture.linktoimage = picture.linktoimage.replace('dl=0', 'raw=1');
             });
         });
@@ -164,8 +166,14 @@ router.put('/upd-post', verifyToken, [
     } else {
         // deformating all data
         const { catid, description, linktoimage, instock, discountexp, onsale, saleexp, amount, id, genderid, rate } = req.body;
+        linktoimage.forEach(color => {
+            color.pictures.forEach(picture => {
+                picture.linktoimage = picture.linktoimage.replace('dl=0', 'raw=1');
+            });
+        });
+        const newlinktoimage = JSON.stringify(linktoimage);
         // when everything is okay
-        await updPostController(catid, description, linktoimage, instock, discountexp, onsale, saleexp, amount, genderid, rate, id).then(response => {
+        await updPostController(catid, description, newlinktoimage, instock, discountexp, onsale, saleexp, amount, genderid, rate, id).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);
@@ -278,6 +286,29 @@ router.get('/get-colors', async (req, res) => {
         return res.json({ response })
     })
 })
+
+// add a new color 
+router.post('/add-color', verifyToken, [
+    check('name').exists().withMessage('You must provide a color name'),
+    check('code').exists().withMessage('You must provide a color code'),
+], async (req, res) => {
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(JSON.stringify(req.body));
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { name, code } = req.body;
+        newColorCode = '#' + code;
+        // when everything is okay
+        await addColorController(name, newColorCode).then(response => {
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
 
 // add a new gender 
 router.post('/add-gender', verifyToken, [
@@ -418,6 +449,29 @@ router.put('/upd-gender', verifyToken, [
         const { id, name } = req.body;
         // when everything is okay
         await updGenderController(id, name).then(response => {
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
+
+// update a color 
+router.put('/upd-color', verifyToken, [
+    check('id').exists().withMessage('You must provide an id'),
+    check('name').exists().withMessage('You must provide a name'),
+    check('colorcode').exists().withMessage('You must provide a colorcode'),
+], async (req, res) => {
+    console.log('hey');
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { id, name, colorcode } = req.body;
+        // when everything is okay
+        await updColorController(id, name, colorcode).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);

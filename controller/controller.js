@@ -279,7 +279,7 @@ module.exports.delPostController = async (postId) => {
 module.exports.getPostsController = async (offset, order, sortby) => {
     let response;
     getPostsQuery = {
-        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount,rate,genderid FROM posts ORDER BY ' + sortby + ' ' + order + ' OFFSET $1 FETCH FIRST 10 ROWS ONLY',
+        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount,rate, genderid FROM posts ORDER BY ' + sortby + ' ' + order + ' OFFSET $1 FETCH FIRST 10 ROWS ONLY',
         values: [offset]
     }
     await client.query(getPostsQuery).then(async res => {
@@ -586,6 +586,49 @@ module.exports.addGenderController = async (name) => {
     return response;
 }
 
+
+// a function to add gender
+module.exports.addColorController = async (name, color) => {
+    name = name.trim();
+    code = color.trim();
+    let response
+    query = 'SELECT COUNT(1) FROM colors WHERE colorcode=$1';
+    values = [code];
+    await client.query(query, values).then(async res => {
+        if (res.rows[0].count == 1) {
+            response = {
+                error: 1,
+                message: 'color already exists'
+            }
+        } else {
+            let insertQuery = {
+                text: 'INSERT INTO colors(name,colorcode) VALUES ($1,$2) RETURNING *',
+                values: [name, code]
+            }
+            await client.query(insertQuery).then(res => {
+                response = {
+                    error: 0,
+                    message: 'color added',
+                    data: res.rows
+                }
+            }).catch(err => {
+                response = {
+                    error: 1,
+                    message: 'color not added'
+                }
+                console.log(err);
+            })
+        }
+    }).catch(e => {
+        response = {
+            error: 1,
+            message: '404'
+        }
+        console.log(e);
+    })
+    return response;
+}
+
 // a function to add category
 module.exports.addCategoryController = async (name) => {
     name = name.trim();
@@ -681,6 +724,26 @@ module.exports.updCategoryController = async (id, name) => {
         response = {
             error: 1,
             message: "category not updated"
+        }
+        console.log(e);
+    })
+    return response;
+}
+
+// a function to update color
+module.exports.updColorController = async (id, name, colorcode) => {
+    let response;
+    let text = 'UPDATE colors SET name=$2,colorcode=$3 WHERE id=$1';
+    values = [id, name,colorcode];
+    await client.query(text, values).then(async res => {
+        response = {
+            error: 0,
+            message: 'color updated'
+        }
+    }).catch(e => {
+        response = {
+            error: 1,
+            message: "color not updated"
         }
         console.log(e);
     })
