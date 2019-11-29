@@ -116,6 +116,8 @@ router.post('/add-post', verifyToken, [
     check('instock').exists().withMessage('You must provide a inStock'),
     check('amount').exists().withMessage('You must provide the amount'),
     check('genderid').exists().withMessage('You must provide the gender id'),
+    check('name').exists().withMessage('You must provide the product name'),
+    check('sizes').exists().withMessage('You must provide the product sizes'),
 ], async (req, res) => {
     // validating data
     const errors = validationResult(req);
@@ -125,17 +127,17 @@ router.post('/add-post', verifyToken, [
         let discountexp = 0;
         let onsale = 0;
         let saleexp = 0;
-        let rate = 0;
         // deformating all data
-        const { categoryid, description, linktoimage, instock, amount, genderid } = req.body;
+        const { categoryid, description, linktoimage, instock, amount, genderid, name, sizes } = req.body;
         linktoimage.forEach(color => {
             color.pictures.forEach(picture => {
                 picture.linktoimage = picture.linktoimage.replace('dl=0', 'raw=1');
             });
         });
         const newlinktoimage = JSON.stringify(linktoimage);
+        const newsizes = JSON.stringify(sizes);
         // when everything is okay
-        await addPostController(categoryid, description, newlinktoimage, instock, discountexp, onsale, saleexp, amount, genderid, rate).then(response => {
+        await addPostController(categoryid, description, newlinktoimage, instock, discountexp, onsale, saleexp, amount, genderid, name, newsizes).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);
@@ -156,7 +158,8 @@ router.put('/upd-post', verifyToken, [
     check('amount').exists().withMessage('You must provide the amount'),
     check('id').exists().withMessage('You must provide the postid'),
     check('genderid').exists().withMessage('You must provide the gender id'),
-    check('rate').exists().withMessage('You must provide the ratings')
+    check('name').exists().withMessage('You must provide the product name'),
+    check('sizes').exists().withMessage('You must provide the product sizes'),
 ], async (req, res) => {
     // validating data
     const errors = validationResult(req);
@@ -165,15 +168,16 @@ router.put('/upd-post', verifyToken, [
         return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
     } else {
         // deformating all data
-        const { catid, description, linktoimage, instock, discountexp, onsale, saleexp, amount, id, genderid, rate } = req.body;
+        const { catid, description, linktoimage, instock, discountexp, onsale, saleexp, amount, id, genderid, name, sizes } = req.body;
         linktoimage.forEach(color => {
             color.pictures.forEach(picture => {
                 picture.linktoimage = picture.linktoimage.replace('dl=0', 'raw=1');
             });
         });
         const newlinktoimage = JSON.stringify(linktoimage);
+        const newsizes = JSON.stringify(sizes);
         // when everything is okay
-        await updPostController(catid, description, newlinktoimage, instock, discountexp, onsale, saleexp, amount, genderid, rate, id).then(response => {
+        await updPostController(catid, description, newlinktoimage, instock, discountexp, onsale, saleexp, amount, genderid, name, id, newsizes).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);
