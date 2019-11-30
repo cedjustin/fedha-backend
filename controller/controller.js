@@ -163,6 +163,7 @@ module.exports.addPostController = async (categoryid, description, linkToImage, 
             message: 'post arleady exist'
         }
     } else {
+        let i = 0;
         let insertQuery = {
             text: 'INSERT INTO posts(catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount,genderid,name,sizes) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *',
             values: [categoryid, getTimeStamp, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, genderId, name, sizes]
@@ -770,237 +771,49 @@ module.exports.updGenderController = async (id, name) => {
     return response;
 }
 
+// a function to get carousel data
+module.exports.getCarouselController = async () => {
+    let response;
+    let query = {
+        text: 'SELECT * FROM carousel'
+    }
+    await client.query(query).then(async res => {
+        if (res.rows.length <= 0) {
+            response = {
+                error: 1,
+                message: 'you have no posts'
+            }
+        } else {
+            response = {
+                error: 0,
+                message: 'you have set ' + res.rows.length + ' posts',
+                data: res.rows
+            }
+        }
+    });
+    return response;
+}
 
-// module.exports.getMonthlyBudgetsController = async (userid, timestamp) => {
-//     let response;
-//     userexists = await checkIfUserExists(userid);
-//     if (userexists == 'user exists') {
-//         getBudgetQuery = {
-//             text: 'SELECT amount,timestamp,remaining,expired FROM budget WHERE userid=$1 AND timestamp=$2',
-//             values: [userid, timestamp]
-//         }
-//         await client.query(getBudgetQuery).then(async res => {
-//             if (res.rows.length <= 0) {
-//                 response = {
-//                     error: 1,
-//                     message: 'you have no budget for this month'
-//                 }
-//             } else {
-//                 response = {
-//                     error: 0,
-//                     message: 'success',
-//                     data: res.rows
-//                 }
-//             }
-//         }).catch(e => {
-//             console.log(e);
-//             response = {
-//                 error: 1,
-//                 message: "404"
-//             };
-//         })
-//     } else {
-//         response = {
-//             error: 1,
-//             message: "user doesn't exists"
-//         }
-//     }
-//     return response;
-// }
-
-// // function to get all budgets
-// module.exports.getTypesController = async (userid) => {
-//     let response;
-//     userexists = await checkIfUserExists(userid);
-//     if (userexists == 'user exists') {
-//         getTypesQuery = {
-//             text: 'SELECT id,types_description,image,color FROM types ORDER BY id DESC'
-//         }
-//         await client.query(getTypesQuery).then(async res => {
-//             if (res.rows.length <= 0) {
-//                 response = {
-//                     error: 1,
-//                     message: 'there are no types'
-//                 }
-//             } else {
-//                 response = {
-//                     error: 0,
-//                     message: 'there are ' + res.rows.length + ' types',
-//                     data: res.rows
-//                 }
-//             }
-//         }).catch(e => {
-//             console.log(e);
-//             response = {
-//                 error: 1,
-//                 message: "404"
-//             };
-//         })
-//     } else {
-//         response = {
-//             error: 1,
-//             message: "user doesn't exists"
-//         }
-//     }
-//     return response;
-// }
-
-// // activities controllers
-
-// // get activities
-// module.exports.getActivitiesController = async (userid, timestamp) => {
-//     let response;
-//     userexists = await checkIfUserExists(userid);
-//     if (userexists == 'user exists') {
-//         getTypesQuery = {
-//             text: `SELECT activities.id,activities.type_id,activities.description,
-//             activities.budget_id,activities.amount,activities.user_id,activities.timestamp FROM activities
-//             WHERE activities.user_id=$1 AND activities.timestamp=$2 ORDER BY id DESC`,
-//             values: [userid, timestamp]
-//         }
-//         await client.query(getTypesQuery).then(async res => {
-//             if (res.rows.length <= 0) {
-//                 response = {
-//                     error: 1,
-//                     message: 'there are no activities'
-//                 }
-//             } else {
-//                 response = {
-//                     error: 0,
-//                     message: 'there are ' + res.rows.length + ' activities',
-//                     data: res.rows
-//                 }
-//             }
-//         }).catch(e => {
-//             console.log(e);
-//             response = {
-//                 error: 1,
-//                 message: "404"
-//             };
-//         })
-//     } else {
-//         response = {
-//             error: 1,
-//             message: "user doesn't exists"
-//         }
-//     }
-//     return response;
-// }
-
-
-// // set activities
-// module.exports.updActivityController = async (typeid, description, budget, amount, userid, timestamp, activityid) => {
-//     userid = userid.trim();
-//     budget = budget.trim();
-//     description = description.trim();
-//     amount = amount.trim();
-//     typeid = typeid.trim();
-//     timestamp = timestamp.trim();
-//     activityid = activityid.trim();
-//     let response;
-//     userexists = await checkIfUserExists(userid);
-//     if (userexists == 'user exists') {
-//         let updateQuery = {
-//             text: 'UPDATE activities SET type_id=$1,description=$2,budget_id=$3,amount=$4,user_id=$5,timestamp=$6 WHERE id=$7',
-//             values: [typeid, description, budget, amount, userid, timestamp, activityid]
-//         }
-//         await client.query(updateQuery).then(async res => {
-//             response = await this.getActivitiesController(userid, timestamp);
-//         }).catch(e => {
-//             console.log(e);
-//             response = {
-//                 error: 1,
-//                 message: "404",
-//             };
-//         })
-//     } else {
-//         response = {
-//             error: 1,
-//             message: "user doesn't exists"
-//         }
-//     }
-//     return response;
-// }
-
-// // set activities
-// module.exports.addActivityController = async (typeid, description, budget, amount, userid, timestamp) => {
-//     userid = userid.trim();
-//     budget = budget.trim();
-//     description = description.trim();
-//     amount = amount.trim();
-//     typeid = typeid.trim();
-//     timestamp = timestamp.trim();
-//     let response;
-//     userexists = await checkIfUserExists(userid);
-//     if (userexists == 'user exists') {
-//         let text = 'SELECT COUNT(1) FROM activities WHERE timestamp=$1 AND amount=$2 AND description=$3';
-//         values = [timestamp, amount, description];
-//         await client.query(text, values).then(async res => {
-//             if (res.rows[0].count == 1) {
-//                 response = {
-//                     error: 1,
-//                     message: "activity already exists"
-//                 };
-//             } else {
-//                 let insertQuery = {
-//                     text: 'INSERT INTO activities(type_id,description,budget_id,amount,user_id,timestamp) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *',
-//                     values: [typeid, description, budget, amount, userid, timestamp]
-//                 }
-//                 await client.query(insertQuery).then(async res => {
-//                     let activities = await this.getActivitiesController(userid, timestamp);
-//                     response = {
-//                         error: 0,
-//                         message: 'Proceed',
-//                         data: activities
-//                     }
-//                 }).catch(e => {
-//                     console.log(e);
-//                     response = {
-//                         error: 1,
-//                         message: "404"
-//                     };
-//                 })
-//             }
-//         }).catch(e => {
-//             console.log(e);
-//         })
-//     } else {
-//         response = {
-//             error: 1,
-//             message: "user doesn't exists"
-//         }
-//     }
-//     return response;
-// }
-
-// // delete activities
-// module.exports.delActivityController = async (userid, activityid) => {
-//     userid = userid.trim();
-//     activityid = activityid.trim();
-//     let response;
-//     userexists = await checkIfUserExists(userid);
-//     if (userexists == 'user exists') {
-//         let text = 'DELETE FROM activities WHERE id=$1';
-//         values = [activityid];
-//         await client.query(text, values).then(async res => {
-//             response = {
-//                 error: 0,
-//                 message: "activity deleted"
-//             }
-//         }).catch(e => {
-//             response = {
-//                 error: 1,
-//                 message: "activity not deleted"
-//             }
-//             console.log(e);
-//         })
-//     } else {
-//         response = {
-//             error: 1,
-//             message: "user doesn't exists"
-//         }
-//     }
-//     return response;
-// }
-
-// end of controllers
+// a function to update carousel data
+module.exports.updCarouselController = async (imagelink, title, postid) => {
+    let response;
+    let query = {
+        text: 'UPDATE carousel SET linktoimage=$1,title=$2 WHERE id=$3',
+        values: [imagelink, title, postid]
+    }
+    await client.query(query).then(async res => {
+        if (res.rows.length <= 0) {
+            response = {
+                error: 1,
+                message: 'you have no posts'
+            }
+        } else {
+            response = {
+                error: 0,
+                message: 'you have set ' + res.rows.length + ' posts',
+                data: res.rows
+            }
+        }
+    });
+    return response;
+}

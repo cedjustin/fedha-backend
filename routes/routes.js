@@ -20,6 +20,7 @@ const {
     getGenderController,
     getCategoryController,
     getColorsController,
+    getCarouselController,
     delPostController,
     delGenderController,
     delCategoryController,
@@ -28,7 +29,8 @@ const {
     updPostOnSaleController,
     updPostFromSaleController,
     updPostController,
-    updColorController
+    updColorController,
+    updCarouselController
 } = require('../controller/controller');
 
 
@@ -291,6 +293,14 @@ router.get('/get-colors', async (req, res) => {
     })
 })
 
+// get all carousel data
+router.get('/get-carousel', async (req, res) => {
+    // when everything is okay
+    await getCarouselController().then(response => {
+        return res.json({ response })
+    })
+})
+
 // add a new color 
 router.post('/add-color', verifyToken, [
     check('name').exists().withMessage('You must provide a color name'),
@@ -498,6 +508,28 @@ router.put('/upd-category', verifyToken, [
         const { id, name } = req.body;
         // when everything is okay
         await updCategoryController(id, name).then(response => {
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
+
+// update a carousel 
+router.put('/upd-carousel', verifyToken, [
+    check('id').exists().withMessage('You must provide an id'),
+    check('title').exists().withMessage('You must provide a title'),
+    check('linktoimage').exists().withMessage('You must provide a link to image'),
+], async (req, res) => {
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { id, title, linktoimage } = req.body;
+        // when everything is okay
+        await updCarouselController(linktoimage, title, id).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);
