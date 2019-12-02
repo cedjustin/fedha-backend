@@ -11,6 +11,7 @@ const {
     addGenderController,
     addColorController,
     addCategoryController,
+    addProducttypeController,
     getPostsController,
     getPostsOnSaleController,
     getPostsOnDiscountController,
@@ -21,16 +22,19 @@ const {
     getCategoryController,
     getColorsController,
     getCarouselController,
-    delPostController,
-    delGenderController,
-    delCategoryController,
+    getProducttypeController,
     updCategoryController,
     updGenderController,
     updPostOnSaleController,
     updPostFromSaleController,
     updPostController,
     updColorController,
-    updCarouselController
+    updCarouselController,
+    updProducttypeController,
+    delPostController,
+    delGenderController,
+    delCategoryController,
+    delProducttypeController,
 } = require('../controller/controller');
 
 
@@ -277,6 +281,14 @@ router.get('/get-gender', async (req, res) => {
     })
 })
 
+// get all types
+router.get('/get-types', async (req, res) => {
+    // when everything is okay
+    await getProducttypeController().then(response => {
+        return res.json({ response })
+    })
+})
+
 // get all category
 router.get('/get-category', async (req, res) => {
     // when everything is okay
@@ -427,6 +439,26 @@ router.delete('/del-gender/:id', verifyToken, [
     }
 });
 
+// delete a producttype 
+router.delete('/del-type/:id', verifyToken, [
+    check('id').exists().withMessage('You must provide an id')
+], async (req, res) => {
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { id } = req.params;
+        // when everything is okay
+        await delProducttypeController(id).then(response => {
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
+
 
 // delete a category 
 router.delete('/del-category/:id', verifyToken, [
@@ -463,6 +495,27 @@ router.put('/upd-gender', verifyToken, [
         const { id, name } = req.body;
         // when everything is okay
         await updGenderController(id, name).then(response => {
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
+
+// update a gender 
+router.put('/upd-type', verifyToken, [
+    check('id').exists().withMessage('You must provide an id'),
+    check('name').exists().withMessage('You must provide a name')
+], async (req, res) => {
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { id, name } = req.body;
+        // when everything is okay
+        await updProducttypeController(id, name).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);

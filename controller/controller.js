@@ -155,6 +155,7 @@ module.exports.addPostController = async (categoryid, description, linkToImage, 
     categoryid = categoryid;
     description = description.trim();
     genderId = genderId.trim();
+    producttype = sizes.productType;
     let response;
     let postExists = await checkIfPostExists(categoryid, description, amount);
     if (postExists) {
@@ -163,10 +164,9 @@ module.exports.addPostController = async (categoryid, description, linkToImage, 
             message: 'post arleady exist'
         }
     } else {
-        let i = 0;
         let insertQuery = {
-            text: 'INSERT INTO posts(catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount,genderid,name,sizes) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *',
-            values: [categoryid, getTimeStamp, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, genderId, name, sizes]
+            text: 'INSERT INTO posts(catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount,genderid,name,sizes,producttype) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *',
+            values: [categoryid, getTimeStamp, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, genderId, name, sizes, producttype]
         }
         await client.query(insertQuery).then(async res => {
             response = {
@@ -235,10 +235,11 @@ module.exports.updPostFromSaleController = async (postid) => {
 module.exports.updPostController = async (categoryid, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, genderId, name, postId, sizes) => {
     description = description.trim();
     linkToImage = linkToImage.replace('dl=0', 'raw=1');
+    productType = sizes.productType;
     let response;
     let updatePostQuery = {
-        text: 'UPDATE posts SET catid=$1,description=$2,linktoimage=$3,instock=$4,discountexp=$5,onsale=$6,saleexp=$7,amount=$8,name=$9,genderid=$10,sizes=$11 WHERE id=$12',
-        values: [categoryid, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, name, genderId, sizes, postId]
+        text: 'UPDATE posts SET catid=$1,description=$2,linktoimage=$3,instock=$4,discountexp=$5,onsale=$6,saleexp=$7,amount=$8,name=$9,genderid=$10,sizes=$11,producttype=$12 WHERE id=$13',
+        values: [categoryid, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, name, genderId, sizes, productType, postId]
     }
     await client.query(updatePostQuery).then(async res => {
         response = {
@@ -280,7 +281,7 @@ module.exports.delPostController = async (postId) => {
 module.exports.getPostsController = async (offset, order, sortby) => {
     let response;
     getPostsQuery = {
-        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount,name, genderid,sizes FROM posts ORDER BY ' + sortby + ' ' + order + ' OFFSET $1 FETCH FIRST 10 ROWS ONLY',
+        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount,name, genderid,sizes,producttype FROM posts ORDER BY ' + sortby + ' ' + order + ' OFFSET $1 FETCH FIRST 10 ROWS ONLY',
         values: [offset]
     }
     await client.query(getPostsQuery).then(async res => {
@@ -518,7 +519,7 @@ module.exports.getColorsController = async () => {
 }
 
 //a function to get gender 
-module.exports.getCategoryController = async (offset, order, sortby) => {
+module.exports.getCategoryController = async () => {
     let response;
     getGenderQuery = {
         text: 'SELECT id,name from categories'
@@ -533,6 +534,35 @@ module.exports.getCategoryController = async (offset, order, sortby) => {
             response = {
                 error: 0,
                 message: 'you have set ' + res.rows.length + ' categories',
+                data: res.rows
+            }
+        }
+    }).catch(e => {
+        console.log(e)
+        response = {
+            error: 1,
+            message: "404"
+        };
+    });
+    return response;
+}
+
+//a function to get gender 
+module.exports.getProducttypeController = async () => {
+    let response;
+    getGenderQuery = {
+        text: 'SELECT id,name from producttype'
+    }
+    await client.query(getGenderQuery).then(async res => {
+        if (res.rows.length <= 0) {
+            response = {
+                error: 1,
+                message: 'you have no types in db'
+            }
+        } else {
+            response = {
+                error: 0,
+                message: 'you have set ' + res.rows.length + ' types',
                 data: res.rows
             }
         }
@@ -671,6 +701,48 @@ module.exports.addCategoryController = async (name) => {
     return response;
 }
 
+
+// a function to add category
+module.exports.addProducttypeController = async (name) => {
+    name = name.trim();
+    let response
+    query = 'SELECT COUNT(1) FROM producttype WHERE name=$1';
+    values = [name];
+    await client.query(query, values).then(async res => {
+        if (res.rows[0].count == 1) {
+            response = {
+                error: 1,
+                message: 'category already exists'
+            }
+        } else {
+            let insertQuery = {
+                text: 'INSERT INTO producttype(name) VALUES ($1) RETURNING *',
+                values: [name]
+            }
+            await client.query(insertQuery).then(res => {
+                response = {
+                    error: 0,
+                    message: 'producttype added',
+                    data: res.rows
+                }
+            }).catch(err => {
+                response = {
+                    error: 1,
+                    message: 'producttype not added'
+                }
+                console.log(err);
+            })
+        }
+    }).catch(e => {
+        response = {
+            error: 1,
+            message: '404'
+        }
+        console.log(e);
+    })
+    return response;
+}
+
 // a function to delete gender
 module.exports.delGenderController = async (id) => {
     let reponse;
@@ -705,6 +777,26 @@ module.exports.delCategoryController = async (id) => {
         response = {
             error: 1,
             message: "category not deleted"
+        }
+        console.log(e);
+    })
+    return response;
+}
+
+// a function to delete category
+module.exports.delProducttypeController = async (id) => {
+    let response;
+    let text = 'DELETE FROM producttype WHERE id=$1';
+    values = [id];
+    await client.query(text, values).then(async res => {
+        response = {
+            error: 0,
+            message: 'type deleted'
+        }
+    }).catch(e => {
+        response = {
+            error: 1,
+            message: "type not deleted"
         }
         console.log(e);
     })
@@ -765,6 +857,26 @@ module.exports.updGenderController = async (id, name) => {
         response = {
             error: 1,
             message: "gender not updated"
+        }
+        console.log(e);
+    })
+    return response;
+}
+
+// a function to update product type
+module.exports.updProducttypeController = async (id, name) => {
+    let response;
+    let text = 'UPDATE producttype SET name=$2 WHERE id=$1';
+    values = [id, name];
+    await client.query(text, values).then(async res => {
+        response = {
+            error: 0,
+            message: 'type updated'
+        }
+    }).catch(e => {
+        response = {
+            error: 1,
+            message: "type not updated"
         }
         console.log(e);
     })
