@@ -12,6 +12,7 @@ const {
     addColorController,
     addCategoryController,
     addProducttypeController,
+    getPostsByProducttypeController,
     getPostsController,
     getPostsOnSaleController,
     getPostsOnDiscountController,
@@ -217,10 +218,21 @@ router.get('/get-posts', async (req, res) => {
 
     // deconstracting data
     const { sortby, offset, order } = req.headers;
-    console.log(req.headers);
 
     // when everything is okay
     await getPostsController(offset, order, sortby).then(response => {
+        return res.json({ response })
+    })
+});
+
+// get posts 
+router.get('/get-posts-by-product-type', async (req, res) => {
+
+    // deconstracting data
+    const { producttype, offset } = req.headers;
+
+    // when everything is okay
+    await getPostsByProducttypeController(producttype, offset).then(response => {
         return res.json({ response })
     })
 });

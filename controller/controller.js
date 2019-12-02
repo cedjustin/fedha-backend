@@ -307,6 +307,36 @@ module.exports.getPostsController = async (offset, order, sortby) => {
     return response;
 }
 
+// function to get all budgets
+module.exports.getPostsByProducttypeController = async (type, offset) => {
+    let response;
+    getPostsQuery = {
+        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount,name, genderid,sizes,producttype FROM posts WHERE producttype=$1 ORDER BY DESC OFFSET $2 FETCH FIRST 10 ROWS ONLY',
+        values: [type, offset]
+    }
+    await client.query(getPostsQuery).then(async res => {
+        if (res.rows.length <= 0) {
+            response = {
+                error: 1,
+                message: 'you have no posts'
+            }
+        } else {
+            response = {
+                error: 0,
+                message: 'you have set ' + res.rows.length + ' posts',
+                data: res.rows
+            }
+        }
+    }).catch(e => {
+        console.log(e)
+        response = {
+            error: 1,
+            message: "404"
+        };
+    });
+    return response;
+}
+
 
 //a function to get posts which are only on sales
 module.exports.getPostsOnSaleController = async (offset, order, sortby) => {
