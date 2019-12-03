@@ -12,7 +12,7 @@ const {
     addColorController,
     addCategoryController,
     addProducttypeController,
-    getPostsByProducttypeController,
+    getPostsByConditionController,
     getPostsController,
     getPostsOnSaleController,
     getPostsOnDiscountController,
@@ -226,15 +226,15 @@ router.get('/get-posts', async (req, res) => {
 });
 
 // get posts 
-router.get('/get-posts-by-product-type', async (req, res) => {
+router.get('/get-posts-by-condition', async (req, res) => {
 
     // deconstracting data
-    const { producttype, offset } = req.headers;
+    const { condition, value, offset } = req.headers;
 
     // when everything is okay
-    await getPostsByProducttypeController(producttype, offset).then(response => {
+    await getPostsByConditionController(condition, value, offset).then(response => {
         return res.json({ response })
-    })
+    });
 });
 
 // get posts which are on sale

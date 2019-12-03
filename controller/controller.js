@@ -308,11 +308,11 @@ module.exports.getPostsController = async (offset, order, sortby) => {
 }
 
 // function to get all budgets
-module.exports.getPostsByProducttypeController = async (type, offset) => {
+module.exports.getPostsByConditionController = async (condition, value, offset) => {
     let response;
     getPostsQuery = {
-        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount,name, genderid,sizes,producttype FROM posts WHERE producttype=$1 ORDER BY DESC OFFSET $2 FETCH FIRST 10 ROWS ONLY',
-        values: [type, offset]
+        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount,name, genderid,sizes,producttype FROM posts WHERE ' + condition + '=$1 ORDER BY id DESC OFFSET $2 FETCH FIRST 10 ROWS ONLY',
+        values: [value, offset]
     }
     await client.query(getPostsQuery).then(async res => {
         if (res.rows.length <= 0) {
