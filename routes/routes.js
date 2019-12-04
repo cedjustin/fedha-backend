@@ -11,7 +11,10 @@ const {
     addGenderController,
     addColorController,
     addCategoryController,
-    addProducttypeController,
+    addProductTypeController,
+    getShopInfoController,
+    addBlogContentController,
+    getBlogContentController,
     getPostsByConditionController,
     getPostsController,
     getPostsOnSaleController,
@@ -24,6 +27,8 @@ const {
     getColorsController,
     getCarouselController,
     getProducttypeController,
+    updProductTypeController,
+    updBlogContentController,
     updCategoryController,
     updGenderController,
     updPostOnSaleController,
@@ -31,7 +36,8 @@ const {
     updPostController,
     updColorController,
     updCarouselController,
-    updProducttypeController,
+    updShopInfoController,
+    delBlogContentController,
     delPostController,
     delGenderController,
     delCategoryController,
@@ -225,6 +231,15 @@ router.get('/get-posts', async (req, res) => {
     })
 });
 
+// get shop info 
+router.get('/get-shop-info', async (req, res) => {
+
+    // when everything is okay
+    await getShopInfoController().then(response => {
+        return res.json({ response })
+    })
+});
+
 // get posts 
 router.get('/get-posts-by-condition', async (req, res) => {
 
@@ -325,6 +340,18 @@ router.get('/get-carousel', async (req, res) => {
     })
 })
 
+
+// get all blog data
+router.get('/get-blog-content', async (req, res) => {
+
+    const { offset } = req.headers;
+
+    // when everything is okay
+    await getBlogContentController(offset).then(response => {
+        return res.json({ response })
+    })
+})
+
 // add a new color 
 router.post('/add-color', verifyToken, [
     check('name').exists().withMessage('You must provide a color name'),
@@ -341,6 +368,27 @@ router.post('/add-color', verifyToken, [
         newColorCode = '#' + code;
         // when everything is okay
         await addColorController(name, newColorCode).then(response => {
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
+
+// add a new type 
+router.post('/add-type', verifyToken, [
+    check('name').exists().withMessage('You must provide a type name'),
+], async (req, res) => {
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(JSON.stringify(req.body));
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { name } = req.body;
+        // when everything is okay
+        await addProductTypeController(name).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);
@@ -389,6 +437,29 @@ router.post('/add-category', verifyToken, [
     }
 });
 
+// add a new blog content 
+router.post('/add-blog-content', verifyToken, [
+    check('title').exists().withMessage('You must provide a title'),
+    check('content').exists().withMessage('You must provide the content'),
+    check('linktoimage').exists().withMessage('You must provide linktoimage'),
+], async (req, res) => {
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { title, content, linktoimage } = req.body;
+        newlinktoimage = linktoimage.replace('dl=0', 'raw=1');
+        // when everything is okay
+        await addBlogContentController(title, content, newlinktoimage).then(response => {
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
+
 
 // put on sale
 router.put('/upd-put-on-sale', verifyToken, [
@@ -404,6 +475,51 @@ router.put('/upd-put-on-sale', verifyToken, [
         const { postid, days } = req.body;
         // when everything is okay
         await updPostOnSaleController(postid, days).then(response => {
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
+
+// update product type
+router.put('/upd-product-type', verifyToken, [
+    check('id').exists().withMessage('You must provide a type id'),
+    check('name').exists().withMessage('You must provide a name')
+], async (req, res) => {
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { id, name } = req.body;
+        // when everything is okay
+        await updProductTypeController(id, name).then(response => {
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
+
+// put on sale
+router.put('/upd-shop-info', verifyToken, [
+    check('id').exists().withMessage('You must provide a id'),
+    check('location').exists().withMessage('You must provide a location'),
+    check('phone').exists().withMessage('You must provide a phone'),
+    check('email').exists().withMessage('You must provide an email'),
+    check('about').exists().withMessage('You must provide an about')
+], async (req, res) => {
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { id, location, phone, email, about } = req.body;
+        // when everything is okay
+        await updShopInfoController(id, location, phone, email, about).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);
@@ -492,6 +608,26 @@ router.delete('/del-category/:id', verifyToken, [
     }
 });
 
+// delete a blog content 
+router.delete('/del-blog-content/:id', verifyToken, [
+    check('id').exists().withMessage('You must provide an id')
+], async (req, res) => {
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { id } = req.params;
+        // when everything is okay
+        await delBlogContentController(id).then(response => {
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
+
 
 // update a gender 
 router.put('/upd-gender', verifyToken, [
@@ -507,27 +643,6 @@ router.put('/upd-gender', verifyToken, [
         const { id, name } = req.body;
         // when everything is okay
         await updGenderController(id, name).then(response => {
-            return res.json({ response });
-        }).then(e => {
-            console.log(e);
-        })
-    }
-});
-
-// update a gender 
-router.put('/upd-type', verifyToken, [
-    check('id').exists().withMessage('You must provide an id'),
-    check('name').exists().withMessage('You must provide a name')
-], async (req, res) => {
-    // validating data
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
-    } else {
-        // deformating all data
-        const { id, name } = req.body;
-        // when everything is okay
-        await updProducttypeController(id, name).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);
@@ -580,10 +695,35 @@ router.put('/upd-category', verifyToken, [
     }
 });
 
+// update a blog content 
+router.put('/upd-blog-content', verifyToken, [
+    check('id').exists().withMessage('You must provide an id'),
+    check('linktoimage').exists().withMessage('You must provide a link to image'),
+    check('content').exists().withMessage('You must provide the content'),
+    check('comments').exists().withMessage('You must provide the comments'),
+    check('title').exists().withMessage('You must provide the title'),
+], async (req, res) => {
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { id, linktoimage, content, comments, title } = req.body;
+        const newlinktoimage = linktoimage.replace('dl=0', 'raw=1');
+        // when everything is okay
+        await updBlogContentController(id, newlinktoimage, content, comments, title).then(response => {
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
+
 // update a carousel 
 router.put('/upd-carousel', verifyToken, [
     check('id').exists().withMessage('You must provide an id'),
-    check('title').exists().withMessage('You must provide a title'),
+    check('name').exists().withMessage('You must provide a title'),
     check('linktoimage').exists().withMessage('You must provide a link to image'),
 ], async (req, res) => {
     // validating data
@@ -592,9 +732,9 @@ router.put('/upd-carousel', verifyToken, [
         return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
     } else {
         // deformating all data
-        const { id, title, linktoimage } = req.body;
+        const { id, name, linktoimage } = req.body;
         // when everything is okay
-        await updCarouselController(linktoimage, title, id).then(response => {
+        await updCarouselController(linktoimage, name, id).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);

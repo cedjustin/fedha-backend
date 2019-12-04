@@ -186,6 +186,35 @@ module.exports.addPostController = async (categoryid, description, linkToImage, 
 }
 
 
+// function to add blog content
+module.exports.addBlogContentController = async (title, content, linktoimage) => {
+    getTimeStamp = await _getTimeStamp();
+    title = title.trim();
+    content = content.trim();
+    linktoimage = linktoimage.trim();
+    comments = '[]';
+    let response;
+    let insertQuery = {
+        text: 'INSERT INTO blog(title,linktoimage,content,datecreated,comments) VALUES ($1,$2,$3,$4,$5) RETURNING *',
+        values: [title, linktoimage, content, getTimeStamp, comments]
+    }
+    await client.query(insertQuery).then(async res => {
+        response = {
+            error: 0,
+            message: 'blog content added',
+            data: res.rows
+        }
+    }).catch(e => {
+        console.log(e)
+        response = {
+            error: 1,
+            message: "404"
+        };
+    })
+    return response;
+}
+
+
 // function to put post on sale
 module.exports.updPostOnSaleController = async (postid, days) => {
     const saleexp = moment().add(days, 'days');
@@ -282,6 +311,67 @@ module.exports.getPostsController = async (offset, order, sortby) => {
     let response;
     getPostsQuery = {
         text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount,name, genderid,sizes,producttype FROM posts ORDER BY ' + sortby + ' ' + order + ' OFFSET $1 FETCH FIRST 10 ROWS ONLY',
+        values: [offset]
+    }
+    await client.query(getPostsQuery).then(async res => {
+        if (res.rows.length <= 0) {
+            response = {
+                error: 1,
+                message: 'you have no posts'
+            }
+        } else {
+            response = {
+                error: 0,
+                message: 'you have set ' + res.rows.length + ' posts',
+                data: res.rows
+            }
+        }
+    }).catch(e => {
+        console.log(e)
+        response = {
+            error: 1,
+            message: "404"
+        };
+    });
+    return response;
+}
+
+
+// function to get shop info
+module.exports.getShopInfoController = async () => {
+    let response;
+    getPostsQuery = {
+        text: 'SELECT id,about,email,phone,location FROM shopinfo',
+    }
+    await client.query(getPostsQuery).then(async res => {
+        if (res.rows.length <= 0) {
+            response = {
+                error: 1,
+                message: 'you have no shop info'
+            }
+        } else {
+            response = {
+                error: 0,
+                message: 'you have set ' + res.rows.length + ' posts',
+                data: res.rows
+            }
+        }
+    }).catch(e => {
+        console.log(e)
+        response = {
+            error: 1,
+            message: "404"
+        };
+    });
+    return response;
+}
+
+
+// function to get all budgets
+module.exports.getBlogContentController = async (offset) => {
+    let response;
+    getPostsQuery = {
+        text: 'SELECT id,title,datecreated,content,linktoimage,comments FROM blog ORDER BY id DESC OFFSET $1 FETCH FIRST 3 ROWS ONLY',
         values: [offset]
     }
     await client.query(getPostsQuery).then(async res => {
@@ -690,6 +780,47 @@ module.exports.addColorController = async (name, color) => {
     return response;
 }
 
+// a function to add gender
+module.exports.addProductTypeController = async (name) => {
+    name = name.trim();
+    let response
+    query = 'SELECT COUNT(1) FROM producttype WHERE name=$1';
+    values = [name];
+    await client.query(query, values).then(async res => {
+        if (res.rows[0].count == 1) {
+            response = {
+                error: 1,
+                message: 'type already exists'
+            }
+        } else {
+            let insertQuery = {
+                text: 'INSERT INTO producttype(name) VALUES ($1) RETURNING *',
+                values: [name]
+            }
+            await client.query(insertQuery).then(res => {
+                response = {
+                    error: 0,
+                    message: 'type added',
+                    data: res.rows
+                }
+            }).catch(err => {
+                response = {
+                    error: 1,
+                    message: 'type not added'
+                }
+                console.log(err);
+            })
+        }
+    }).catch(e => {
+        response = {
+            error: 1,
+            message: '404'
+        }
+        console.log(e);
+    })
+    return response;
+}
+
 // a function to add category
 module.exports.addCategoryController = async (name) => {
     name = name.trim();
@@ -853,6 +984,48 @@ module.exports.updCategoryController = async (id, name) => {
     return response;
 }
 
+// a function to update shop info
+module.exports.updShopInfoController = async (id, location, phone, email, about) => {
+    let response;
+    let text = 'UPDATE shopinfo SET location=$2,phone=$3,email=$4,about=$5 WHERE id=$1';
+    values = [id, location, phone, email, about];
+    await client.query(text, values).then(async res => {
+        response = {
+            error: 0,
+            message: 'shop info updated'
+        }
+    }).catch(e => {
+        response = {
+            error: 1,
+            message: "shop info not updated"
+        }
+        console.log(e);
+    })
+    return response;
+}
+
+
+// a function to update blog content
+module.exports.updBlogContentController = async (id, newlinktoimage, content, comments, title) => {
+    let response;
+    let text = 'UPDATE blog SET linktoimage=$2,content=$3,comments=$4,title=$5 WHERE id=$1';
+    values = [id, newlinktoimage, content, comments, title];
+    await client.query(text, values).then(async res => {
+        response = {
+            error: 0,
+            message: 'blog updated'
+        }
+    }).catch(e => {
+        response = {
+            error: 1,
+            message: "blog not updated"
+        }
+        console.log(e);
+    })
+    return response;
+}
+
+
 // a function to update color
 module.exports.updColorController = async (id, name, colorcode) => {
     let response;
@@ -867,6 +1040,26 @@ module.exports.updColorController = async (id, name, colorcode) => {
         response = {
             error: 1,
             message: "color not updated"
+        }
+        console.log(e);
+    })
+    return response;
+}
+
+// a function to update product type
+module.exports.updProductTypeController = async (id, name) => {
+    let response;
+    let text = 'UPDATE producttype SET name=$2 WHERE id=$1';
+    values = [id, name];
+    await client.query(text, values).then(async res => {
+        response = {
+            error: 0,
+            message: 'type updated'
+        }
+    }).catch(e => {
+        response = {
+            error: 1,
+            message: "type not updated"
         }
         console.log(e);
     })
@@ -917,13 +1110,13 @@ module.exports.updProducttypeController = async (id, name) => {
 module.exports.getCarouselController = async () => {
     let response;
     let query = {
-        text: 'SELECT * FROM carousel'
+        text: 'SELECT * FROM carousel ORDER BY id DESC'
     }
     await client.query(query).then(async res => {
         if (res.rows.length <= 0) {
             response = {
                 error: 1,
-                message: 'you have no posts'
+                message: 'you have no carousel posts'
             }
         } else {
             response = {
@@ -937,25 +1130,63 @@ module.exports.getCarouselController = async () => {
 }
 
 // a function to update carousel data
-module.exports.updCarouselController = async (imagelink, title, postid) => {
+module.exports.updCarouselController = async (imagelink, name, postid) => {
     let response;
     let query = {
-        text: 'UPDATE carousel SET linktoimage=$1,title=$2 WHERE id=$3',
-        values: [imagelink, title, postid]
+        text: 'UPDATE carousel SET linktoimage=$1,name=$2 WHERE id=$3',
+        values: [imagelink, name, postid]
     }
     await client.query(query).then(async res => {
-        if (res.rows.length <= 0) {
-            response = {
-                error: 1,
-                message: 'you have no posts'
-            }
-        } else {
-            response = {
-                error: 0,
-                message: 'you have set ' + res.rows.length + ' posts',
-                data: res.rows
-            }
+        response = {
+            error: 0,
+            message: 'carousel updated'
         }
-    });
+    }).catch(e => {
+        response = {
+            error: 1,
+            message: "carousel not updated"
+        }
+        console.log(e);
+    })
+    return response;
+}
+
+// delete post
+module.exports.delBlogContentController = async (postId) => {
+    let response;
+    let text = 'DELETE FROM blog WHERE id=$1';
+    values = [postId];
+    await client.query(text, values).then(async res => {
+        response = {
+            error: 0,
+            message: "blog deleted"
+        };
+    }).catch(e => {
+        response = {
+            error: 1,
+            message: "blog not deleted "
+        }
+        console.log(e);
+    })
+    return response;
+}
+
+// delete product type
+module.exports.delProductTypeController = async (id) => {
+    let response;
+    let text = 'DELETE FROM producttype WHERE id=$1';
+    values = [id];
+    await client.query(text, values).then(async res => {
+        response = {
+            error: 0,
+            message: "product type deleted"
+        };
+    }).catch(e => {
+        response = {
+            error: 1,
+            message: "product type not deleted "
+        }
+        console.log(e);
+    })
     return response;
 }
