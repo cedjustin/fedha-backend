@@ -1220,3 +1220,26 @@ module.exports.sendEmailController = async (email, message) => {
     });
     return response;
 }
+
+// a function to handle searches
+module.exports.searchController = async (value) => {
+    let response;
+    let query = {
+        text: "SELECT * FROM posts WHERE name LIKE '%" + value + "%' OR description LIKE '%" + value + "%' ORDER BY id DESC",
+    }
+    await client.query(query).then(async res => {
+        if (res.rows.length <= 0) {
+            response = {
+                error: 1,
+                message: 'you have no posts'
+            }
+        } else {
+            response = {
+                error: 0,
+                message: 'you have set ' + res.rows.length + ' posts',
+                data: res.rows
+            }
+        }
+    });
+    return response;
+}

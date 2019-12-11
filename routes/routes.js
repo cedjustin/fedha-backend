@@ -42,7 +42,8 @@ const {
     delGenderController,
     delCategoryController,
     delProducttypeController,
-    sendEmailController
+    sendEmailController,
+    searchController
 } = require('../controller/controller');
 
 
@@ -745,10 +746,9 @@ router.put('/upd-carousel', verifyToken, [
 
 // an api to send emails
 router.post('/send-email', [
-    check('email').exists().withMessage('You must provide an id'),
-    check('message').exists().withMessage('You must provide a title'),
+    check('email').exists().withMessage('You must provide an email'),
+    check('message').exists().withMessage('You must provide a message'),
 ], async (req, res) => {
-    console.log('hey')
     // validating data
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -759,6 +759,26 @@ router.post('/send-email', [
         // when everything is okay
         await sendEmailController(email, message).then(response => {
             console.log(response);
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
+
+// an api to handle searches
+router.post('/search', [
+    check('value').exists().withMessage('You must provide the value to be searched'),
+], async (req, res) => {
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { value } = req.body;
+        // when everything is okay
+        await searchController(value).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);
