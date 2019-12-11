@@ -42,6 +42,7 @@ const {
     delGenderController,
     delCategoryController,
     delProducttypeController,
+    sendEmailController
 } = require('../controller/controller');
 
 
@@ -735,6 +736,29 @@ router.put('/upd-carousel', verifyToken, [
         const { id, name, linktoimage } = req.body;
         // when everything is okay
         await updCarouselController(linktoimage, name, id).then(response => {
+            return res.json({ response });
+        }).then(e => {
+            console.log(e);
+        })
+    }
+});
+
+// an api to send emails
+router.post('/send-email', [
+    check('email').exists().withMessage('You must provide an id'),
+    check('message').exists().withMessage('You must provide a title'),
+], async (req, res) => {
+    console.log('hey')
+    // validating data
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
+    } else {
+        // deformating all data
+        const { email, message } = req.body;
+        // when everything is okay
+        await sendEmailController(email, message).then(response => {
+            console.log(response);
             return res.json({ response });
         }).then(e => {
             console.log(e);

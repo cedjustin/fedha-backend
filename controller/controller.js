@@ -1,7 +1,6 @@
 // importing dependencies
-const {
-    Client
-} = require('pg');
+const { Client } = require('pg');
+const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
 const saltRounds = 10;
 
@@ -1188,5 +1187,36 @@ module.exports.delProductTypeController = async (id) => {
         }
         console.log(e);
     })
+    return response;
+}
+
+// send email message
+module.exports.sendEmailController = async (email, message) => {
+    let response;
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'cedro265@gmail.com',
+            pass: 'Mzecedu!2'
+        }
+    });
+
+    var mailOptions = {
+        to: 'bahatipatrick05@gmail.com',
+        subject: 'Email from Your e-commerce website',
+        text: message + ' sentby ' + email
+    };
+
+    response = await transporter.sendMail(mailOptions).then(info => {
+        return response = {
+            error: 0,
+            message: 'email sent'
+        }
+    }).catch(error => {
+        return response = {
+            error: 1,
+            message: 'email not sent'
+        }
+    });
     return response;
 }
