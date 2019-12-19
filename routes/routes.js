@@ -735,8 +735,9 @@ router.put('/upd-carousel', verifyToken, [
     } else {
         // deformating all data
         const { id, name, linktoimage } = req.body;
+        const newlinktoimage = linktoimage.replace('dl=0', 'raw=1');
         // when everything is okay
-        await updCarouselController(linktoimage, name, id).then(response => {
+        await updCarouselController(newlinktoimage, name, id).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);
