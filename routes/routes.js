@@ -152,7 +152,7 @@ router.post('/add-post', verifyToken, [
         const newlinktoimage = JSON.stringify(linktoimage);
         const newsizes = JSON.stringify(sizes);
         // when everything is okay
-        await addPostController(categoryid, description, newlinktoimage, instock, discountexp, onsale, saleexp, amount, genderid, name, newsizes).then(response => {
+        await addPostController(categoryid, description, newlinktoimage, instock, discountexp, onsale, saleexp, amount, genderid, name, newsizes, sizes.productType).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);

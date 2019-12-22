@@ -149,12 +149,11 @@ const checkIfPostExists = async (categoryid, description, amount) => {
 }
 
 // function to add a post or product
-module.exports.addPostController = async (categoryid, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, genderId, name, sizes) => {
+module.exports.addPostController = async (categoryid, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, genderId, name, sizes, producttype) => {
     getTimeStamp = await _getTimeStamp();
     categoryid = categoryid;
     description = description.trim();
     genderId = genderId.trim();
-    producttype = sizes.productType;
     let response;
     let postExists = await checkIfPostExists(categoryid, description, amount);
     if (postExists) {
