@@ -132,10 +132,10 @@ module.exports.signUpController = async (username, password) => {
     return response
 }
 
-const checkIfPostExists = async (categoryid, description, amount) => {
+const checkIfPostExists = async (name, description, amount) => {
     let response
-    query = 'SELECT COUNT(1) FROM posts WHERE catid=$1 AND description=$2 AND amount=$3';
-    values = [categoryid, description, amount];
+    query = 'SELECT COUNT(1) FROM posts WHERE name=$1 AND description=$2 AND amount=$3';
+    values = [name, description, amount];
     await client.query(query, values).then(async res => {
         if (res.rows[0].count == 1) {
             response = true
@@ -149,13 +149,11 @@ const checkIfPostExists = async (categoryid, description, amount) => {
 }
 
 // function to add a post or product
-module.exports.addPostController = async (categoryid, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, genderId, name, sizes, producttype) => {
+module.exports.addPostController = async (linkToImage, description, amount, name) => {
     getTimeStamp = await _getTimeStamp();
-    categoryid = categoryid;
     description = description.trim();
-    genderId = genderId.trim();
     let response;
-    let postExists = await checkIfPostExists(categoryid, description, amount);
+    let postExists = await checkIfPostExists(name, description, amount);
     if (postExists) {
         response = {
             error: 1,
@@ -163,8 +161,8 @@ module.exports.addPostController = async (categoryid, description, linkToImage, 
         }
     } else {
         let insertQuery = {
-            text: 'INSERT INTO posts(catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount,genderid,name,sizes,producttype) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *',
-            values: [categoryid, getTimeStamp, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, genderId, name, sizes, producttype]
+            text: 'INSERT INTO posts(datecreated,description,linktoimage,amount,name) VALUES ($1,$2,$3,$4,$5) RETURNING *',
+            values: [getTimeStamp, description, linkToImage, amount,name]
         }
         await client.query(insertQuery).then(async res => {
             response = {
@@ -183,90 +181,13 @@ module.exports.addPostController = async (categoryid, description, linkToImage, 
     return response;
 }
 
-
-// function to add blog content
-module.exports.addBlogContentController = async (title, content, linktoimage) => {
-    getTimeStamp = await _getTimeStamp();
-    title = title.trim();
-    content = content.trim();
-    linktoimage = linktoimage.trim();
-    comments = '[]';
-    let response;
-    let insertQuery = {
-        text: 'INSERT INTO blog(title,linktoimage,content,datecreated,comments) VALUES ($1,$2,$3,$4,$5) RETURNING *',
-        values: [title, linktoimage, content, getTimeStamp, comments]
-    }
-    await client.query(insertQuery).then(async res => {
-        response = {
-            error: 0,
-            message: 'blog content added',
-            data: res.rows
-        }
-    }).catch(e => {
-        console.log(e)
-        response = {
-            error: 1,
-            message: "404"
-        };
-    })
-    return response;
-}
-
-
-// function to put post on sale
-module.exports.updPostOnSaleController = async (postid, days) => {
-    const saleexp = moment().add(days, 'days');
-    let response;
-    const updatePostQuery = {
-        text: 'UPDATE posts SET onsale=$2,saleexp=$3 WHERE id=$1',
-        values: [postid, '1', saleexp]
-    }
-    await client.query(updatePostQuery).then(async res => {
-        response = {
-            error: 0,
-            message: 'post putted on sale'
-        };
-    }).catch(e => {
-        console.log(e);
-        response = {
-            error: 1,
-            message: "404"
-        };
-    })
-    return response;
-}
-
-// function to remove post on sale
-module.exports.updPostFromSaleController = async (postid) => {
-    let response;
-    const updatePostQuery = {
-        text: 'UPDATE posts SET onsale=$2,saleexp=$3 WHERE id=$1',
-        values: [postid, '0', '0']
-    }
-    await client.query(updatePostQuery).then(async res => {
-        response = {
-            error: 0,
-            message: 'post removed on sale'
-        };
-    }).catch(e => {
-        console.log(e);
-        response = {
-            error: 1,
-            message: "404"
-        };
-    })
-    return response;
-}
-
 // function to update all budgets
-module.exports.updPostController = async (categoryid, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, genderId, name, postId, sizes) => {
-    description = description.trim();
+module.exports.updPostController = async (description, linkToImage, amount, name, postId) => {
     linkToImage = linkToImage.replace('dl=0', 'raw=1');
-    productType = sizes.productType;
     let response;
     let updatePostQuery = {
-        text: 'UPDATE posts SET catid=$1,description=$2,linktoimage=$3,instock=$4,discountexp=$5,onsale=$6,saleexp=$7,amount=$8,name=$9,genderid=$10,sizes=$11,producttype=$12 WHERE id=$13',
-        values: [categoryid, description, linkToImage, inStock, discountexp, onsale, saleexp, amount, name, genderId, sizes, productType, postId]
+        text: 'UPDATE posts SET description=$1,linktoimage=$2,amount=$3,name=$4 WHERE id=$5',
+        values: [description, linkToImage, amount, name, postId]
     }
     await client.query(updatePostQuery).then(async res => {
         response = {
@@ -308,7 +229,7 @@ module.exports.delPostController = async (postId) => {
 module.exports.getPostsController = async (offset, order, sortby) => {
     let response;
     getPostsQuery = {
-        text: 'SELECT id,catid,datecreated,description,linktoimage,instock,discountexp,onsale,saleexp,amount,name, genderid,sizes,producttype FROM posts ORDER BY ' + sortby + ' ' + order + ' OFFSET $1 FETCH FIRST 10 ROWS ONLY',
+        text: 'SELECT id,datecreated,description,linktoimage,amount,name FROM posts ORDER BY ' + sortby + ' ' + order + ' OFFSET $1 FETCH FIRST 10 ROWS ONLY',
         values: [offset]
     }
     await client.query(getPostsQuery).then(async res => {

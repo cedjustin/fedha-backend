@@ -125,34 +125,21 @@ router.post('/signup', [
 
 // add a new post 
 router.post('/add-post', verifyToken, [
-    check('categoryid').exists().withMessage('You must provide a a category id'),
     check('description').exists().withMessage('You must provide a description'),
     check('linktoimage').exists().withMessage('You must provide a linkToImage'),
-    check('instock').exists().withMessage('You must provide a inStock'),
     check('amount').exists().withMessage('You must provide the amount'),
-    check('genderid').exists().withMessage('You must provide the gender id'),
     check('name').exists().withMessage('You must provide the product name'),
-    check('sizes').exists().withMessage('You must provide the product sizes'),
 ], async (req, res) => {
     // validating data
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
     } else {
-        let discountexp = 0;
-        let onsale = 0;
-        let saleexp = 0;
         // deformating all data
-        const { categoryid, description, linktoimage, instock, amount, genderid, name, sizes } = req.body;
-        linktoimage.forEach(color => {
-            color.pictures.forEach(picture => {
-                picture.linktoimage = picture.linktoimage.replace('dl=0', 'raw=1');
-            });
-        });
-        const newlinktoimage = JSON.stringify(linktoimage);
-        const newsizes = JSON.stringify(sizes);
+        const { description, linktoimage, amount, name} = req.body;
+        const newlinktoimage = linktoimage.replace('dl=0', 'raw=1');;
         // when everything is okay
-        await addPostController(categoryid, description, newlinktoimage, instock, discountexp, onsale, saleexp, amount, genderid, name, newsizes, sizes.productType).then(response => {
+        await addPostController(newlinktoimage, description, amount, name).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);
@@ -162,19 +149,12 @@ router.post('/add-post', verifyToken, [
 
 // upd a new post 
 router.put('/upd-post', verifyToken, [
-    check('catid').exists().withMessage('You must provide a a category id'),
     check('datecreated').exists().withMessage('You must provide a datecreated'),
     check('description').exists().withMessage('You must provide a description'),
     check('linktoimage').exists().withMessage('You must provide a linkToImage'),
-    check('instock').exists().withMessage('You must provide a inStock'),
-    check('discountexp').exists().withMessage('You must provide a discountexp'),
-    check('onsale').exists().withMessage('You must provide if product is on sale'),
-    check('saleexp').exists().withMessage('You must provide if product is on sale'),
     check('amount').exists().withMessage('You must provide the amount'),
     check('id').exists().withMessage('You must provide the postid'),
-    check('genderid').exists().withMessage('You must provide the gender id'),
     check('name').exists().withMessage('You must provide the product name'),
-    check('sizes').exists().withMessage('You must provide the product sizes'),
 ], async (req, res) => {
     // validating data
     const errors = validationResult(req);
@@ -183,16 +163,10 @@ router.put('/upd-post', verifyToken, [
         return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
     } else {
         // deformating all data
-        const { catid, description, linktoimage, instock, discountexp, onsale, saleexp, amount, id, genderid, name, sizes } = req.body;
-        linktoimage.forEach(color => {
-            color.pictures.forEach(picture => {
-                picture.linktoimage = picture.linktoimage.replace('dl=0', 'raw=1');
-            });
-        });
-        const newlinktoimage = JSON.stringify(linktoimage);
-        const newsizes = JSON.stringify(sizes);
+        const { description, linktoimage,amount, id, name} = req.body;
+        const newlinktoimage = linktoimage.replace('dl=0', 'raw=1');
         // when everything is okay
-        await updPostController(catid, description, newlinktoimage, instock, discountexp, onsale, saleexp, amount, genderid, name, id, newsizes).then(response => {
+        await updPostController(description, newlinktoimage, amount, name, id ).then(response => {
             return res.json({ response });
         }).then(e => {
             console.log(e);
