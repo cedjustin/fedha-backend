@@ -135,7 +135,7 @@ router.post('/add-post', verifyToken, [
     if (!errors.isEmpty()) {
         return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
     } else {
-        console.log(req.body.linktoimage.pictures)
+        console.log(req.body.linktoimage.data)
         // deformating all data
         const { description, linktoimage, amount, name} = req.body;
         const newlinktoimage = linktoimage.replace('dl=0', 'raw=1');
