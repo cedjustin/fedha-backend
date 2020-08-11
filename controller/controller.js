@@ -10,7 +10,7 @@ const moment = require('moment');
 
 // configuring the db
 const client = new Client({
-    connectionString: process.env.Database_url,
+    connectionString: process.env.DATABASE_URL,
     ssl: true,
 });
 
