@@ -138,6 +138,7 @@ router.post('/add-post', verifyToken, [
         // deformating all data
         const { description, linktoimage, amount, name} = req.body;
         // const newlinktoimage = linktoimage.replace('dl=0', 'raw=1');
+        // 
         // when everything is okay
         await addPostController(newlinktoimage, description, amount, name).then(response => {
             return res.json({ response });
