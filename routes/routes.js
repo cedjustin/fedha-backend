@@ -135,10 +135,10 @@ router.post('/add-post', verifyToken, [
     if (!errors.isEmpty()) {
         return res.json({ error: 1, message: 'check your inputs and make sure they exists and they are correct' });
     } else {
+        console.log(req.body)
         // deformating all data
         const { description, linktoimage, amount, name} = req.body;
         const newlinktoimage = linktoimage.replace('dl=0', 'raw=1');
-        console.log(req.body)
         // when everything is okay
         await addPostController(newlinktoimage, description, amount, name).then(response => {
             return res.json({ response });
